@@ -5,7 +5,7 @@
 //
 // data/projects.geojson  one Point per project (work location) + details
 
-const BASEMAP = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+const BASEMAP = 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json';
 const ACCENT = '#0f766e';
 
 const map = new maplibregl.Map({
