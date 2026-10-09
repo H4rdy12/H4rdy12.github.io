@@ -1,0 +1,44 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-4.0829, 52.4153] },
+      "properties": {
+        "id": "flood-risk",
+        "title": "Flood Risk Mapping",
+        "summary": "Hydrological modelling of flood extents across a river catchment using LiDAR terrain data.",
+        "category": "Analysis",
+        "tools": ["QGIS", "Python", "LiDAR"],
+        "year": 2025,
+        "url": "projects/flood-risk.html"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-3.1791, 51.4816] },
+      "properties": {
+        "id": "urban-greenspace",
+        "title": "Urban Greenspace Access",
+        "summary": "Network analysis of walking distance to public greenspace for every residential address.",
+        "category": "Network analysis",
+        "tools": ["PostGIS", "pgRouting", "Python"],
+        "year": 2024,
+        "url": "projects/urban-greenspace.html"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-3.9431, 53.0685] },
+      "properties": {
+        "id": "land-cover",
+        "title": "Land Cover Change Detection",
+        "summary": "Supervised classification of Sentinel-2 imagery to track land cover change over five years.",
+        "category": "Remote sensing",
+        "tools": ["Google Earth Engine", "Sentinel-2", "JavaScript"],
+        "year": 2024,
+        "url": "projects/land-cover.html"
+      }
+    }
+  ]
+}

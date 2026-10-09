@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Name — Geospatial Portfolio</title>
+  <meta name="description" content="Geospatial portfolio: an interactive map of projects I have worked on.">
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <h1>Your Name</h1>
+      <p class="tagline">GIS Analyst · Spatial Data · Web Mapping</p>
+    </div>
+    <nav>
+      <a href="https://github.com/yourusername" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="mailto:you@example.com">Email</a>
+    </nav>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-intro">
+        <h2>Projects</h2>
+        <p>Each pin is a project. Click a pin or a card to explore.</p>
+        <label for="tool-filter" class="filter-label">Filter by tool</label>
+        <select id="tool-filter">
+          <option value="">All tools</option>
+        </select>
+      </div>
+      <ul id="project-list" class="project-list" aria-label="Project list"></ul>
+    </aside>
+
+    <div id="map" class="map" role="region" aria-label="Map of projects"></div>
+  </main>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="js/map.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flood Risk Mapping — Your Name</title>
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+  <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+  <article class="project-page">
+    <a class="back" href="../index.html">← Back to map</a>
+    <h1>Flood Risk Mapping</h1>
+    <div class="meta">Analysis · 2025</div>
+    <div class="tags"><span class="tag">QGIS</span><span class="tag">Python</span><span class="tag">LiDAR</span></div>
+
+    <div id="mini-map" class="mini-map" aria-label="Project location"></div>
+
+    <h2>Overview</h2>
+    <p>Hydrological modelling of flood extents across a river catchment using LiDAR terrain data.</p>
+    <p><em>Replace this with a short description: what was the problem, who was it for, and why does it matter?</em></p>
+
+    <h2>Data</h2>
+    <ul>
+      <li><em>Dataset name, source and licence</em></li>
+      <li><em>Coordinate reference system used, e.g. EPSG:27700 (British National Grid)</em></li>
+    </ul>
+
+    <h2>Methods</h2>
+    <p><em>Walk through your workflow: preprocessing, analysis steps, tools and why you chose them.</em></p>
+
+    <h2>Results</h2>
+    <!-- <img src="../images/flood-risk.png" alt="Map of results"> -->
+    <p><em>Add a map or figure of your results and explain what it shows.</em></p>
+
+    <h2>What I learned</h2>
+    <p><em>Challenges, what you would do differently, next steps.</em></p>
+
+    <div class="links">
+      <a class="button" href="https://github.com/yourusername/flood-risk" target="_blank" rel="noopener">View code</a>
+      <a class="button secondary" href="../index.html">All projects</a>
+    </div>
+  </article>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script>
+    const lngLat = [-4.0829, 52.4153];
+    const map = new maplibregl.Map({
+      container: 'mini-map',
+      style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+      center: lngLat,
+      zoom: 10,
+      attributionControl: { compact: true }
+    });
+    new maplibregl.Marker({ color: '#0f766e' }).setLngLat(lngLat).addTo(map);
+  </script>
+</body>
+</html>

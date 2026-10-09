@@ -1,0 +1,123 @@
+:root {
+  --bg: #f7f7f5;
+  --panel: #ffffff;
+  --text: #1d2327;
+  --muted: #5f6b73;
+  --border: #e2e4e6;
+  --accent: #0f766e;
+  --accent-soft: #ccfbf1;
+  --header-h: 72px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+a { color: var(--accent); }
+
+/* Header */
+.site-header {
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.site-header h1 { margin: 0; font-size: 1.3rem; }
+.tagline { margin: 2px 0 0; color: var(--muted); font-size: 0.9rem; }
+.site-header nav { display: flex; gap: 16px; }
+.site-header nav a { text-decoration: none; font-weight: 500; }
+
+/* Layout: sidebar + map */
+.layout {
+  display: flex;
+  height: calc(100% - var(--header-h));
+}
+.sidebar {
+  width: 340px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+}
+.sidebar-intro { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.sidebar-intro h2 { margin: 0 0 4px; font-size: 1.1rem; }
+.sidebar-intro p { margin: 0 0 12px; color: var(--muted); font-size: 0.9rem; }
+.filter-label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
+#tool-filter {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  background: var(--panel);
+}
+.map { flex: 1; }
+
+/* Project cards */
+.project-list { list-style: none; margin: 0; padding: 0; }
+.project-card {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.project-card:hover, .project-card:focus { background: var(--bg); outline: none; }
+.project-card.active { background: var(--accent-soft); }
+.project-card h3 { margin: 0 0 4px; font-size: 1rem; }
+.project-card .meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+.project-card p { margin: 0 0 8px; font-size: 0.88rem; line-height: 1.4; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+/* Popups */
+.maplibregl-popup-content { padding: 12px 14px; border-radius: 8px; font-family: inherit; }
+.popup h3 { margin: 0 0 4px; font-size: 1rem; }
+.popup p { margin: 0 0 8px; font-size: 0.85rem; line-height: 1.4; }
+.popup .tags { margin-bottom: 8px; }
+.popup a { font-weight: 600; font-size: 0.85rem; }
+
+/* Mobile: map on top, list below */
+@media (max-width: 760px) {
+  :root { --header-h: auto; }
+  .site-header { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 16px; height: auto; }
+  .layout { flex-direction: column-reverse; height: auto; }
+  .map { height: 55vh; flex: none; }
+  .sidebar { width: 100%; border-right: none; overflow: visible; }
+}
+
+/* ---------- Project pages ---------- */
+.project-page { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+.project-page .back { display: inline-block; margin-bottom: 20px; text-decoration: none; }
+.project-page h1 { margin: 0 0 8px; }
+.project-page .meta { color: var(--muted); margin-bottom: 16px; }
+.project-page h2 { margin-top: 32px; font-size: 1.2rem; }
+.project-page p, .project-page li { line-height: 1.6; }
+.project-page img { max-width: 100%; border-radius: 8px; border: 1px solid var(--border); }
+.mini-map { height: 260px; border-radius: 8px; border: 1px solid var(--border); margin: 16px 0; }
+.links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+.button {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+}
+.button.secondary { background: var(--panel); color: var(--accent); border: 1px solid var(--accent); }
