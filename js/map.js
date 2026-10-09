@@ -1,104 +1,92 @@
 // Geospatial portfolio map
-// Loads projects from data/projects.geojson and shows them as clustered
-// points on a CARTO Positron basemap, with a synced list in the sidebar.
+//
+// Pins show where the work happened. Projects at the same location share one pin.
+// Data coverage is shown on each project page (see js/project-page.js).
+//
+// data/projects.geojson  one Point per project (work location) + details
 
 const BASEMAP = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
-const DATA_URL = 'data/projects.geojson';
 const ACCENT = '#0f766e';
 
 const map = new maplibregl.Map({
   container: 'map',
   style: BASEMAP,
-  center: [-3.8, 52.4], // initial view; fitted to the data once loaded
-  zoom: 6.5,
+  center: [-3.5, 54.8],
+  zoom: 5,
   attributionControl: { compact: true }
 });
 
 map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 
-let allFeatures = [];
+let projects = [];
 let popup = null;
 
 map.on('load', async () => {
-  const res = await fetch(DATA_URL);
-  const geojson = await res.json();
-  allFeatures = geojson.features;
+  const data = await fetch('data/projects.geojson').then((r) => r.json());
+  projects = data.features;
 
-  map.addSource('projects', {
-    type: 'geojson',
-    data: geojson,
-    cluster: true,
-    clusterRadius: 40,
-    clusterMaxZoom: 12
-  });
-
-  // Clusters
+  map.addSource('places', { type: 'geojson', data: placesFrom(projects) });
   map.addLayer({
-    id: 'clusters',
+    id: 'place-points',
     type: 'circle',
-    source: 'projects',
-    filter: ['has', 'point_count'],
+    source: 'places',
     paint: {
       'circle-color': ACCENT,
-      'circle-opacity': 0.85,
-      'circle-radius': ['step', ['get', 'point_count'], 16, 5, 22, 10, 28],
-      'circle-stroke-width': 3,
-      'circle-stroke-color': '#ffffff'
-    }
-  });
-  map.addLayer({
-    id: 'cluster-count',
-    type: 'symbol',
-    source: 'projects',
-    filter: ['has', 'point_count'],
-    layout: {
-      'text-field': ['get', 'point_count_abbreviated'],
-      'text-font': ['Montserrat Medium', 'Open Sans Bold'],
-      'text-size': 13
-    },
-    paint: { 'text-color': '#ffffff' }
-  });
-
-  // Individual projects
-  map.addLayer({
-    id: 'project-points',
-    type: 'circle',
-    source: 'projects',
-    filter: ['!', ['has', 'point_count']],
-    paint: {
-      'circle-color': ACCENT,
-      'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, 6, 12, 10],
+      'circle-radius': ['+', 6, ['*', 2, ['get', 'count']]],
       'circle-stroke-width': 2.5,
       'circle-stroke-color': '#ffffff'
     }
   });
-
-  // Click a cluster: zoom in to expand it
-  map.on('click', 'clusters', async (e) => {
-    const feature = map.queryRenderedFeatures(e.point, { layers: ['clusters'] })[0];
-    const zoom = await map.getSource('projects').getClusterExpansionZoom(feature.properties.cluster_id);
-    map.easeTo({ center: feature.geometry.coordinates, zoom });
+  map.addLayer({
+    id: 'place-labels',
+    type: 'symbol',
+    source: 'places',
+    layout: {
+      'text-field': ['get', 'place'],
+      'text-font': ['Montserrat Medium', 'Open Sans Bold'],
+      'text-size': 12,
+      'text-offset': [0, 1.4],
+      'text-anchor': 'top'
+    },
+    paint: { 'text-color': '#1d2327', 'text-halo-color': '#ffffff', 'text-halo-width': 1.5 }
   });
 
-  // Click a project: show popup and highlight its card
-  map.on('click', 'project-points', (e) => {
-    const f = e.features[0];
-    showPopup(f.geometry.coordinates.slice(), f.properties);
-    highlightCard(f.properties.id);
+  map.on('click', 'place-points', (e) => {
+    const place = e.features[0];
+    selectProjects(JSON.parse(place.properties.ids), place.geometry.coordinates.slice());
   });
+  map.on('mouseenter', 'place-points', () => (map.getCanvas().style.cursor = 'pointer'));
+  map.on('mouseleave', 'place-points', () => (map.getCanvas().style.cursor = ''));
 
-  for (const layer of ['clusters', 'project-points']) {
-    map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'));
-    map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''));
-  }
-
-  buildToolFilter(allFeatures);
-  renderList(allFeatures);
-  fitToFeatures(allFeatures);
+  buildToolFilter();
+  renderList(projects);
+  fitToFeatures(projects);
 });
 
-// GeoJSON properties that are arrays come back from MapLibre as JSON strings
+// ---------- Helpers ----------
+
+// Group projects that share a location into one pin
+function placesFrom(features) {
+  const groups = new Map();
+  for (const f of features) {
+    const key = f.geometry.coordinates.join(',');
+    if (!groups.has(key)) groups.set(key, { coords: f.geometry.coordinates, place: f.properties.place, ids: [] });
+    groups.get(key).ids.push(f.properties.id);
+  }
+  return {
+    type: 'FeatureCollection',
+    features: [...groups.values()].map((g) => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: g.coords },
+      properties: { place: g.place, ids: JSON.stringify(g.ids), count: g.ids.length }
+    }))
+  };
+}
+
+const byId = (id) => projects.find((f) => f.properties.id === id);
+
+// GeoJSON array properties come back from MapLibre as strings
 function parseTools(tools) {
   if (Array.isArray(tools)) return tools;
   try { return JSON.parse(tools); } catch { return []; }
@@ -114,24 +102,44 @@ function tagsHtml(tools) {
   return `<div class="tags">${parseTools(tools).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>`;
 }
 
-function showPopup(coords, p) {
+function fitToFeatures(features) {
+  if (!features.length) return;
+  const b = new maplibregl.LngLatBounds();
+  features.forEach((f) => b.extend(f.geometry.coordinates));
+  map.fitBounds(b, { padding: 100, maxZoom: 6, duration: 800 });
+}
+
+// ---------- Selection ----------
+
+function selectProjects(ids, coords) {
   if (popup) popup.remove();
-  popup = new maplibregl.Popup({ offset: 12, maxWidth: '280px' })
+  const items = ids.map(byId).filter(Boolean);
+  popup = new maplibregl.Popup({ offset: 14, maxWidth: '300px' })
     .setLngLat(coords)
     .setHTML(`
       <div class="popup">
-        <h3>${escapeHtml(p.title)}</h3>
-        <p>${escapeHtml(p.summary)}</p>
-        ${tagsHtml(p.tools)}
-        <a href="${escapeHtml(p.url)}">View project →</a>
+        <div class="popup-place">${escapeHtml(items[0]?.properties.place ?? '')}</div>
+        ${items.map(({ properties: p }) => `
+          <div class="popup-item">
+            <h3>${escapeHtml(p.title)}</h3>
+            <div class="meta">${escapeHtml(p.role)} · ${escapeHtml(p.dates)}</div>
+            <p>${escapeHtml(p.summary)}</p>
+            <div class="coverage">Data coverage: ${escapeHtml(p.coverage)}</div>
+            <a href="${escapeHtml(p.url)}">View project →</a>
+          </div>`).join('')}
       </div>`)
     .addTo(map);
+
+  highlightCards(ids);
+  map.flyTo({ center: coords, zoom: Math.max(map.getZoom(), 6), speed: 1.2 });
 }
+
+// ---------- Sidebar ----------
 
 function renderList(features) {
   const list = document.getElementById('project-list');
   list.innerHTML = '';
-  const sorted = [...features].sort((a, b) => b.properties.year - a.properties.year);
+  const sorted = [...features].sort((a, b) => b.properties.sort_year - a.properties.sort_year);
 
   for (const f of sorted) {
     const p = f.properties;
@@ -140,32 +148,32 @@ function renderList(features) {
     li.dataset.id = p.id;
     li.tabIndex = 0;
     li.innerHTML = `
-      <h3>${escapeHtml(p.title)}</h3>
-      <div class="meta">${escapeHtml(p.category)} · ${escapeHtml(p.year)}</div>
+      <div class="card-top">
+        <h3>${escapeHtml(p.title)}</h3>
+        <span class="badge">${escapeHtml(p.category)}</span>
+      </div>
+      <div class="meta">${escapeHtml(p.role)} · ${escapeHtml(p.place)} · ${escapeHtml(p.dates)}</div>
       <p>${escapeHtml(p.summary)}</p>
+      <div class="coverage">Data coverage: ${escapeHtml(p.coverage)}</div>
       ${tagsHtml(p.tools)}`;
 
-    const select = () => {
-      map.flyTo({ center: f.geometry.coordinates, zoom: 13, speed: 1.4 });
-      map.once('moveend', () => showPopup(f.geometry.coordinates.slice(), p));
-      highlightCard(p.id);
-    };
+    const select = () => selectProjects([p.id], f.geometry.coordinates.slice());
     li.addEventListener('click', select);
     li.addEventListener('keydown', (e) => { if (e.key === 'Enter') select(); });
     list.appendChild(li);
   }
 }
 
-function highlightCard(id) {
+function highlightCards(ids) {
   document.querySelectorAll('.project-card').forEach((el) => {
-    el.classList.toggle('active', el.dataset.id === id);
+    el.classList.toggle('active', ids.includes(el.dataset.id));
   });
-  const active = document.querySelector(`.project-card[data-id="${id}"]`);
-  if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  const first = document.querySelector('.project-card.active');
+  if (first) first.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function buildToolFilter(features) {
-  const tools = new Set(features.flatMap((f) => parseTools(f.properties.tools)));
+function buildToolFilter() {
+  const tools = new Set(projects.flatMap((f) => parseTools(f.properties.tools)));
   const select = document.getElementById('tool-filter');
   [...tools].sort().forEach((t) => {
     const opt = document.createElement('option');
@@ -177,18 +185,11 @@ function buildToolFilter(features) {
   select.addEventListener('change', () => {
     const tool = select.value;
     const filtered = tool
-      ? features.filter((f) => parseTools(f.properties.tools).includes(tool))
-      : features;
-    map.getSource('projects').setData({ type: 'FeatureCollection', features: filtered });
-    renderList(filtered);
+      ? projects.filter((f) => parseTools(f.properties.tools).includes(tool))
+      : projects;
+    map.getSource('places').setData(placesFrom(filtered));
     if (popup) popup.remove();
+    renderList(filtered);
     fitToFeatures(filtered);
   });
-}
-
-function fitToFeatures(features) {
-  if (!features.length) return;
-  const bounds = new maplibregl.LngLatBounds();
-  features.forEach((f) => bounds.extend(f.geometry.coordinates));
-  map.fitBounds(bounds, { padding: 80, maxZoom: 11, duration: 800 });
 }

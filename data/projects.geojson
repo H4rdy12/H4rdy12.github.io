@@ -3,41 +3,53 @@
   "features": [
     {
       "type": "Feature",
-      "geometry": { "type": "Point", "coordinates": [-4.0829, 52.4153] },
+      "geometry": { "type": "Point", "coordinates": [-3.2013201443303636, 55.94690984339875] },
       "properties": {
-        "id": "flood-risk",
-        "title": "Flood Risk Mapping",
-        "summary": "Hydrological modelling of flood extents across a river catchment using LiDAR terrain data.",
-        "category": "Analysis",
-        "tools": ["QGIS", "Python", "LiDAR"],
-        "year": 2025,
-        "url": "projects/flood-risk.html"
+        "id": "earthwave",
+        "title": "Earthwave",
+        "role": "Spinternship",
+        "place": "Edinburgh",
+        "category": "Work",
+        "dates": "Jun 2024 – Aug 2024",
+        "sort_year": 2026,
+        "coverage": "Greenland & Antarctica",
+        "summary": "One line on what you did: e.g. processing satellite altimetry to measure ice sheet change.",
+        "tools": ["Python", "Satellite altimetry"],
+        "url": "projects/earthwave.html"
       }
     },
     {
       "type": "Feature",
-      "geometry": { "type": "Point", "coordinates": [-3.1791, 51.4816] },
+      "geometry": { "type": "Point", "coordinates": [-3.1883, 55.9533] },
       "properties": {
-        "id": "urban-greenspace",
-        "title": "Urban Greenspace Access",
-        "summary": "Network analysis of walking distance to public greenspace for every residential address.",
-        "category": "Network analysis",
-        "tools": ["PostGIS", "pgRouting", "Python"],
-        "year": 2024,
-        "url": "projects/urban-greenspace.html"
+        "id": "terratexture",
+        "title": "TerraTexture",
+        "role": "Personal project",
+        "place": "Edinburgh",
+        "category": "Python Package development",
+        "dates": "2026",
+        "sort_year": 2026,
+        "coverage": "Global",
+        "summary": "One line on what TerraTexture does and the global data it uses.",
+        "tools": ["Python", "Rust", "STAC"],
+        "url": "projects/terratexture.html"
       }
     },
     {
       "type": "Feature",
-      "geometry": { "type": "Point", "coordinates": [-3.9431, 53.0685] },
+      "geometry": { "type": "Point", "coordinates": [-2.7845, 54.0104] },
       "properties": {
-        "id": "land-cover",
-        "title": "Land Cover Change Detection",
-        "summary": "Supervised classification of Sentinel-2 imagery to track land cover change over five years.",
-        "category": "Remote sensing",
-        "tools": ["Google Earth Engine", "Sentinel-2", "JavaScript"],
-        "year": 2024,
-        "url": "projects/land-cover.html"
+        "id": "phd",
+        "title": "PhD",
+        "role": "PhD researcher",
+        "place": "Lancaster University",
+        "category": "Research",
+        "dates": "2022 – 2026",
+        "sort_year": 2023,
+        "coverage": "Greenland",
+        "summary": "One line on your thesis topic and the Greenland data you worked with.",
+        "tools": ["Python", "QGIS"],
+        "url": "projects/phd.html"
       }
     }
   ]
