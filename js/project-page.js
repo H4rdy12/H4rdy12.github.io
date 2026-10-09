@@ -51,7 +51,42 @@ const ringsPole = (fs) => Math.max(...lons(fs)) - Math.min(...lons(fs)) >= 300;
     figures.push([mapEl, features]);
   }
   figures.forEach(([mapEl, features]) => drawGlobe(mapEl, features, pin));
+
+  figures.forEach(([mapEl, features]) => drawGlobe(mapEl, features, pin));
+
+  renderLogos(project.properties);   // NEW
 })();
+
+
+// Logo strip at the bottom of the page: the project's own "logo", then any "partner_logos"
+// ({ "src", "alt", "url" }). Paths in projects.geojson are relative to the site root.
+function renderLogos(p) {
+  const strip = document.getElementById('logo-strip');
+  if (!strip) return;
+  const logos = [
+    ...(p.logo ? [{ src: p.logo, alt: `${p.title} logo` }] : []),
+    ...(p.partner_logos || [])
+  ];
+  if (!logos.length) return;
+
+  for (const { src, alt = '', url } of logos) {
+    const img = document.createElement('img');
+    img.src = `../${src}`;
+    img.alt = alt;
+    img.loading = 'lazy';
+    if (url) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.appendChild(img);
+      strip.appendChild(a);
+    } else {
+      strip.appendChild(img);
+    }
+  }
+  strip.hidden = false;
+}
 
 function drawGlobe(el, features, pin) {
   const map = new maplibregl.Map({

@@ -148,10 +148,12 @@ function renderList(features) {
     li.dataset.id = p.id;
     li.tabIndex = 0;
     li.innerHTML = `
-      <div class="card-top">
-        <h3>${escapeHtml(p.title)}</h3>
-        <span class="badge">${escapeHtml(p.category)}</span>
-      </div>
+    <div class="card-top">
+    <h3>${escapeHtml(p.title)}</h3>
+    <div class="card-top-right">
+      <span class="badge">${escapeHtml(p.category)}</span>
+      ${p.logo ? `<img class="card-logo" src="${escapeHtml(p.logo)}" alt="${escapeHtml(p.title)} logo">` : ''}
+    </div>
       <div class="meta">${escapeHtml(p.role)} · ${escapeHtml(p.place)} · ${escapeHtml(p.dates)}</div>
       <p>${escapeHtml(p.summary)}</p>
       <div class="coverage">Data coverage: ${escapeHtml(p.coverage)}</div>

@@ -121,3 +121,29 @@ a { color: var(--accent); }
   font-weight: 500;
 }
 .button.secondary { background: var(--panel); color: var(--accent); border: 1px solid var(--accent); }
+
+/* ---------- Logos ---------- */
+/* Card logo: pinned to the top-right corner, without moving anything else on the card */
+.project-card { position: relative; }
+.card-logo {
+  position: absolute;
+  top: 14px;
+  right: 20px;
+  height: 28px;
+  width: auto;
+  max-width: 72px;
+  object-fit: contain;
+}
+
+/* Logo strip at the bottom of project pages */
+.logo-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 28px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.logo-strip img { height: 48px; width: auto; max-width: 160px; object-fit: contain; border: none; border-radius: 0; }
+.logo-strip a { display: inline-flex; }

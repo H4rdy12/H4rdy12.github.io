@@ -15,7 +15,9 @@
         "coverage": "Greenland & Antarctica",
         "summary": "One line on what you did: e.g. processing satellite altimetry to measure ice sheet change.",
         "tools": ["Python", "Satellite altimetry"],
-        "url": "projects/earthwave.html"
+        "url": "projects/earthwave.html",
+        "logo": "images/logos/earthwave_ltd_logo.jpeg",
+        "partner_logos": []
       }
     },
     {
@@ -30,14 +32,16 @@
         "dates": "2026",
         "sort_year": 2026,
         "coverage": "Global",
-        "summary": "One line on what TerraTexture does and the global data it uses.",
+        "summary": "Python package combining Open Source Digital Elevation Models (via STAC) with basemaps for textured terrain basemaps.",
         "tools": ["Python", "Rust", "STAC"],
-        "url": "projects/terratexture.html"
+        "url": "projects/terratexture.html",
+        "logo": "images/logos/TerraTexture_logo_1.svg",
+        "partner_logos": []
       }
     },
     {
       "type": "Feature",
-      "geometry": { "type": "Point", "coordinates": [-2.7845, 54.0104] },
+      "geometry": { "type": "Point", "coordinates": [-2.7855059002424114, 54.009427373987634] },
       "properties": {
         "id": "phd",
         "title": "PhD",
@@ -49,7 +53,9 @@
         "coverage": "Greenland",
         "summary": "One line on your thesis topic and the Greenland data you worked with.",
         "tools": ["Python", "QGIS"],
-        "url": "projects/phd.html"
+        "url": "projects/phd.html",
+        "logo": "images/logos/DEMSquad_Logo_Team (2).svg",
+        "partner_logos": []
       }
     }
   ]
