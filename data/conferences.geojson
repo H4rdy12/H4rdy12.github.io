@@ -1,0 +1,83 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": { "type": "Point", "coordinates": [16.41738499071304, 48.23506444555653] },
+        "properties": {
+          "id": "lps-2025",
+          "title": "Living Planet Symposium 2025",
+          "place": "Vienna",
+          "dates": "2025",
+          "sort_year": 2025,
+          "contribution": "Attended",
+          "materials": []
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": { "type": "Point", "coordinates": [-4.2518, 55.8642] },
+        "properties": {
+          "id": "spacecom-2024",
+          "title": "Space Comm Glasgow 2024",
+          "place": "Glasgow",
+          "dates": "2024",
+          "sort_year": 2024,
+          "contribution": "Attended",
+          "materials": []
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": { "type": "Point", "coordinates": [-1.7749, 53.3437] },
+        "properties": {
+          "id": "cpom-2026",
+          "title": "CPOM Annual Meeting 2026",
+          "place": "Castleton",
+          "dates": "2026",
+          "sort_year": 2026,
+          "contribution": "Attended",
+          "materials": []
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": { "type": "Point", "coordinates": [-1.7749, 53.3437] },
+        "properties": {
+          "id": "cpom-2025",
+          "title": "CPOM Annual Meeting 2025",
+          "place": "Castleton",
+          "dates": "2025",
+          "sort_year": 2025,
+          "contribution": "Attended",
+          "materials": []
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": { "type": "Point", "coordinates": [-1.7749, 53.3437] },
+        "properties": {
+          "id": "cpom-2024",
+          "title": "CPOM Annual Meeting 2024",
+          "place": "Castleton",
+          "dates": "2024",
+          "sort_year": 2024,
+          "contribution": "Attended",
+          "materials": []
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": { "type": "Point", "coordinates": [-1.7749, 53.3437] },
+        "properties": {
+          "id": "cpom-2023",
+          "title": "CPOM Annual Meeting 2023",
+          "place": "Castleton",
+          "dates": "2023",
+          "sort_year": 2023,
+          "contribution": "Attended",
+          "materials": []
+        }
+      }
+    ]
+  }

@@ -7,6 +7,7 @@
 
 const BASEMAP = 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json';
 const ACCENT = '#0f766e';
+const CONFERENCE = '#dc2626'; // red pins for conferences
 
 const map = new maplibregl.Map({
   container: 'map',
@@ -20,11 +21,33 @@ map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-ri
 map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 
 let projects = [];
+let conferences = [];
 let popup = null;
 
 map.on('load', async () => {
-  const data = await fetch('data/projects.geojson').then((r) => r.json());
+  // Basemap colour tweaks
+  if (map.getLayer('water')) map.setPaintProperty('water', 'fill-color', '#88a6b1');
+
+  const [data, confData] = await Promise.all([
+    fetch('data/projects.geojson').then((r) => r.json()),
+    fetch('data/conferences.geojson').then((r) => r.json())
+  ]);
   projects = data.features;
+  conferences = confData.features;
+
+  // Conferences: red pins, one per location (e.g. all CPOM meetings share Castleton)
+  map.addSource('conferences', { type: 'geojson', data: placesFrom(conferences) });
+  map.addLayer({
+    id: 'conference-points',
+    type: 'circle',
+    source: 'conferences',
+    paint: {
+      'circle-color': CONFERENCE,
+      'circle-radius': ['+', 3, ['get', 'count']],
+      'circle-stroke-width': 1.5,
+      'circle-stroke-color': '#ffffff'
+    }
+  });
 
   map.addSource('places', { type: 'geojson', data: placesFrom(projects) });
   map.addLayer({
@@ -59,9 +82,16 @@ map.on('load', async () => {
   map.on('mouseenter', 'place-points', () => (map.getCanvas().style.cursor = 'pointer'));
   map.on('mouseleave', 'place-points', () => (map.getCanvas().style.cursor = ''));
 
+  map.on('click', 'conference-points', (e) => {
+    const place = e.features[0];
+    selectConferences(JSON.parse(place.properties.ids), place.geometry.coordinates.slice());
+  });
+  map.on('mouseenter', 'conference-points', () => (map.getCanvas().style.cursor = 'pointer'));
+  map.on('mouseleave', 'conference-points', () => (map.getCanvas().style.cursor = ''));
+
   buildToolFilter();
   renderList(projects);
-  fitToFeatures(projects);
+  fitToFeatures([...projects, ...conferences]);
 });
 
 // ---------- Helpers ----------
@@ -133,6 +163,32 @@ function selectProjects(ids, coords) {
   highlightCards(ids);
   map.flyTo({ center: coords, zoom: Math.max(map.getZoom(), 6), speed: 1.2 });
 }
+
+// Popup listing every conference held at one location, newest first, with any materials
+function selectConferences(ids, coords) {
+  if (popup) popup.remove();
+  const items = ids
+    .map((id) => conferences.find((f) => f.properties.id === id))
+    .filter(Boolean)
+    .sort((a, b) => b.properties.sort_year - a.properties.sort_year);
+
+  popup = new maplibregl.Popup({ offset: 12, maxWidth: '300px' })
+    .setLngLat(coords)
+    .setHTML(`
+      <div class="popup">
+        <div class="popup-place">${escapeHtml(items[0]?.properties.place ?? '')} · Conference</div>
+        ${items.map(({ properties: c }) => `
+          <div class="popup-item">
+            <h3>${escapeHtml(c.title)}</h3>
+            <div class="meta">${escapeHtml(c.contribution)} · ${escapeHtml(c.dates)}</div>
+            ${(c.materials || []).length ? `<div class="materials">${c.materials.map((m) =>
+              `<a href="${escapeHtml(m.url)}" target="_blank" rel="noopener">${escapeHtml(m.label)} ↗</a>`).join('')}</div>` : ''}
+          </div>`).join('')}
+      </div>`)
+    .addTo(map);
+}
+
+// ---------- Sidebar ----------
 
 // ---------- Sidebar ----------
 

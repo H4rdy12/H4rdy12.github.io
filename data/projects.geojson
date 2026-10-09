@@ -10,14 +10,18 @@
         "role": "Spinternship",
         "place": "Edinburgh",
         "category": "Work",
-        "dates": "Jun 2024 – Aug 2024",
+        "dates": "2024",
         "sort_year": 2026,
         "coverage": "Greenland & Antarctica",
         "summary": "One line on what you did: e.g. processing satellite altimetry to measure ice sheet change.",
         "tools": ["Python", "Satellite altimetry"],
         "url": "projects/earthwave.html",
         "logo": "images/logos/earthwave_ltd_logo.jpeg",
-        "partner_logos": []
+        "partner_logos": [
+          { "src": "images/logos/UK_SPACE_AGENCY.svg", "alt": "Lancaster University", "url": "hhttps://www.gov.uk/government/organisations/uk-space-agency" },
+          { "src": "images/logos/SPIN_logo.svg", "alt": "SPIN", "url": "https://sa.catapult.org.uk/space-sector-internships/" },
+          { "src": "images/logos/Catapult_logo.svg", "alt": "CATAPULT", "url": "https://sa.catapult.org.uk/" }
+        ]
       }
     },
     {
@@ -31,7 +35,7 @@
         "category": "Python Package development",
         "dates": "2026",
         "sort_year": 2026,
-        "coverage": "Global",
+        "coverage": "Open Source Global",
         "summary": "Python package combining Open Source Digital Elevation Models (via STAC) with basemaps for textured terrain basemaps.",
         "tools": ["Python", "Rust", "STAC"],
         "url": "projects/terratexture.html",
@@ -55,7 +59,10 @@
         "tools": ["Python", "QGIS"],
         "url": "projects/phd.html",
         "logo": "images/logos/DEMSquad_Logo_Team (2).svg",
-        "partner_logos": []
+        "partner_logos": [
+          { "src": "images/logos/lu-logo.svg", "alt": "Lancaster University", "url": "https://www.lancaster.ac.uk" },
+          { "src": "images/logos/NERC_logo.svg", "alt": "NERC", "url": "https://www.ukri.org/councils/nerc/" }
+        ]
       }
     }
   ]

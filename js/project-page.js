@@ -100,7 +100,16 @@ function drawGlobe(el, features, pin) {
   // Globe projection avoids Web Mercator's distortion near the poles
   map.on('style.load', () => map.setProjection({ type: 'globe' }));
 
-  map.on('load', () => {
+  // map.on('load', () => {
+    map.on('load', () => {
+      // Basemap colour tweaks
+      if (map.getLayer('water')) map.setPaintProperty('water', 'fill-color', '#cfe3ea');
+      if (map.getLayer('background')) map.setPaintProperty('background', 'background-color', '#f0f0f0');
+      if (map.getLayer('landcover')) {
+        map.setPaintProperty('landcover', 'fill-color', '#228B22');
+        map.setPaintProperty('landcover', 'fill-opacity', 0.12);
+      }
+
     // buffer: 0 stops polygons near the poles being drawn twice where globe tiles overlap
     map.addSource('extent', { type: 'geojson', data: { type: 'FeatureCollection', features }, buffer: 0 });
     map.addLayer({
