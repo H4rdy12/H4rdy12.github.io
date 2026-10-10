@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TerraTexture — Your Name</title>
+  <title>TerraTexture —  Dominic Hardy</title>
   <link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet">
   <link href="../css/style.css" rel="stylesheet">
 </head>
@@ -11,12 +11,31 @@
   <article class="project-page">
     <a class="back" href="../index.html">← Back to map</a>
     <h1>TerraTexture</h1>
-    <div class="meta">Personal project · Edinburgh · 20XX</div>
-    <div class="tags"><span class="tag">Python</span></div>
+    <div class="meta">Personal project · Edinburgh · 2026</div>
+    <div class="tags">
+      <span class="tag">Python</span>
+      <span class="tag">Rust</span>
+      <span class="tag">STAC</span>
+      <span class="tag">Cloud-optimised GeoTIFFs</span>
+      <span class="tag">Open source</span>
+      <span class="tag">GitHub Actions</span>
+      <span class="tag">contextily</span>
+    </div>
 
     <h2>Overview</h2>
-    <p>One line on what TerraTexture does and the global data it uses.</p>
-    <p><em>Replace this with a short description: what was the problem, who was it for, and why does it matter?</em></p>
+    
+    <p><em>I spent my PhD working with digital elevation models. I’d spend weeks processing terrain data and computing elevation change, then plot the results on a flat, grey, textureless basemap. All that topography vanished at exactly the moment I needed to show it to someone else.</em></p>
+
+    <p><em>That always felt like a shame. When you’re explaining why ice is thinning in more or less in one ice sheet fjord compared to the next, the shape of the land is half the story. A reader needs to see the mountains, troughs and channels to make sense of the numbers on top of/around them.</em></p>
+
+    <p><em>TerraTexture started as my answer to that, and grew into a set of experiments I’d been wanting to try:</em></p>
+
+    <ol>
+      <li>Open data. Could I replace the self-built local STAC catalogs from my PhD with public ones, so anyone could reproduce a map from scratch?</li>
+      <li>Speed and memory. Could Rust make high-resolution DEMs (2–10 m) fast enough, and light enough on memory, to process on an ordinary laptop?</li>
+    </ol>
+
+    <p><em>The result is an open-source Python package (MIT licence) with optional Rust components. You give it an area of interest. It fetches free elevation data from public STAC catalogs, works out where the land surface bends, and blends that texture into a contextily basemap, so scientific data sits on terrain you can actually read. It needs no signups, API keys or private infrastructure.</em></p>
 
     <h2>Data coverage</h2>
     <!-- One globe per coverage area, drawn from data/extents.geojson. The pin marks where the work was done. -->
@@ -37,6 +56,22 @@
 
     <h2>What I learned</h2>
     <p><em>Challenges, what you would do differently, next steps.</em></p>
+    <ul>
+      <li>Context is part of the science. A map that hides the topography makes readers work harder to understand the result.</li>
+      <li>Open by default changes the design. Swapping my private catalogs for public ones forced me to handle other people’s conventions and licences. The payoff is that anyone can reproduce the maps.</li>
+      <li>Real-world STAC is messier than the spec. Supporting both dynamic and static catalogs pushed me towards cleaner abstractions.</li>
+      <li>With cloud-native data, the fastest download is the one you don’t make.</li>
+      <li>At high resolution, memory is the real constraint. Rust’s fused kernels helped as much by avoiding temporary arrays as by running faster.</li>
+      <li>Keep the fast path optional. The NumPy fallback means performance work never costs accessibility.</li>
+      <li>Treat side projects like production code. CI/CD that runs formatting checks and Rust tests and deploys the docs automatically lets me experiment freely.</li>
+    </ul>
+
+    <h2>Where next:</h2>
+    <ul>
+      <li>Stream 2 m tiles in chunks so even larger areas fit in memory</li>
+      <li>Stabilise the CLI and publish to PyPI, increase ease of use</li>
+      <li>Add more public elevation sources</li>
+    </ul>
 
     <div class="links">
       <a class="button" href="https://github.com/H4rdy12" target="_blank" rel="noopener">View code</a>
