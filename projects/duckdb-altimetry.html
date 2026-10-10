@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Querying Altimetry at Scale — Dominic Hardy</title>
+  <title>DuckDB: Querying Altimetry at Scale — Dominic Hardy</title>
   <link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet">
   <link href="../css/style.css" rel="stylesheet">
 </head>
@@ -78,7 +78,7 @@
 
     <h2>Methods</h2>
     <h3>1. The problem was the format, not the code</h3>
-    <p>NetCDF is excellent for what it was designed for: gridded, multi-dimensional climate data. Altimetry is different. It is essentially a long table of points (x, y, elevation, time, error), and NetCDF gave us no way to ask "which points are here, at this time?" without opening and scanning the files themselves. The old workflow found candidate files by date, then looped through them in parallel, reading everything and filtering afterwards.</p>
+    <p>NetCDF is excellent for what it was designed for: gridded, multi-dimensional climate data. Level-2 altimetry is different. It is essentially a long table of points (x, y, elevation, time, error), and NetCDF gave us no way to ask "which points are here, at this time?" without opening and scanning the files themselves. The old workflow found candidate files by date, then looped through them in parallel, reading everything and filtering afterwards.</p>
 
     <div class="dq dq-fig" role="figure" aria-label="Before and after query architecture">
       <h4>How a query works, before and after</h4>
