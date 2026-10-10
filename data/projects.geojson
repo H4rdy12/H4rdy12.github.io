@@ -14,7 +14,7 @@
         "sort_year": 2026,
         "coverage": "Open Source Global",
         "summary": "Python package combining Open Source Digital Elevation Models (via STAC) with basemaps for textured terrain basemaps.",
-        "tools": ["Python", "Rust", "STAC"],
+        "tools": ["Python", "Rust", "PyO3", "Rayon", "NumPy", "STAC", "COG (Cloud-Optimised GeoTIFF)", "contextily", "GitHub Actions"],
         "url": "projects/terratexture.html",
         "logo": "images/logos/TerraTexture_logo_1.svg",
         "partner_logos": [
@@ -37,7 +37,7 @@
         "sort_year": 2024,
         "coverage": "Greenland & Antarctica",
         "summary": "Built a production pipeline turning CryoSat-2 altimetry into monthly ice sheet mass change by basin, delivering data to IMBIE submission standards.",
-        "tools": ["Python", "Satellite altimetry"],
+        "tools": ["Python", "Google Cloud", "GitHub Actions", "CI/CD", "QGIS"],
         "url": "projects/earthwave.html",
         "logo": "images/logos/earthwave_ltd_logo.jpeg",
         "partner_logos": [
@@ -60,7 +60,7 @@
         "sort_year": 2023,
         "coverage": "Greenland",
         "summary": "Cut altimetry queries from ~15 minutes on 15 cores to 8 seconds on one, using Parquet and DuckDB across 22.5 billion points.",
-        "tools": ["DuckDB", "SQL", "Parquet", "Python", "Polars", "HPC"],
+        "tools": ["DuckDB", "DuckDB Spatial", "SQL", "Apache Parquet", "Polars", "Python", "H3", "S2", "R-tree", "HPC"],
         "url": "projects/duckdb-altimetry.html",
         "logo": "images/logos/DEMSquad_Logo_Team (2).svg",
         "partner_logos": [
@@ -83,7 +83,7 @@
         "sort_year": 2022,
         "coverage": "Greenland",
         "summary": "One line on your thesis topic and the Greenland data you worked with.",
-        "tools": ["Python", "QGIS"],
+        "tools": ["Python", "QGIS", "STAC", "HPC"],
         "url": "projects/phd.html",
         "logo": "images/logos/DEMSquad_Logo_Team (2).svg",
         "partner_logos": [
