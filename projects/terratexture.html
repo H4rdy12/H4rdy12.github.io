@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TerraTexture —  Dominic Hardy</title>
+  <title>TerraTexture — Dominic Hardy</title>
   <link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet">
   <link href="../css/style.css" rel="stylesheet">
 </head>
@@ -31,8 +31,8 @@
     <p><em>TerraTexture started as my answer to that, and grew into a set of experiments I’d been wanting to try:</em></p>
 
     <ol>
-      <li>Open data. Could I replace the self-built local STAC catalogs from my PhD with public ones, so anyone could reproduce a map from scratch?</li>
-      <li>Speed and memory. Could Rust make high-resolution DEMs (2–10 m) fast enough, and light enough on memory, to process on an ordinary laptop?</li>
+      <li><strong>Open data:</strong> Could I replace the self-built local STAC catalogs from my PhD with public ones, so anyone could reproduce a map from scratch?</li>
+      <li><strong>Speed and memory:</strong> Could Rust make high-resolution DEMs (2–10 m) fast enough, and light enough on memory, to process on an ordinary laptop?</li>
     </ol>
 
     <p><em>The result is an open-source Python package (MIT licence) with optional Rust components. You give it an area of interest. It fetches free elevation data from public STAC catalogs, works out where the land surface bends, and blends that texture into a contextily basemap, so scientific data sits on terrain you can actually read. It needs no signups, API keys or private infrastructure.</em></p>
@@ -123,18 +123,53 @@
       Things I explored along the way:
       
       <ul>
-        <li>Memory first. Kernels write into a single output buffer allocated once by Python and handed straight back to NumPy, so there are no temporaries and no copies. At 2 m this matters as much as raw speed.</li>
-        <li>Parallelism, but not everywhere. Large arrays are split across CPU cores with Rayon. Small arrays run serially, because starting threads costs more than it saves. The switch-over threshold is still provisional, and measuring it properly is the next experiment.</li>
-        <li>Testable without Python. Each kernel is a pure-Rust core function wrapped by a thin PyO3 layer, so I can test and benchmark the maths with cargo alone.</li>
-        <li>Optional, to stay open. If the Rust extension isn’t available, the package quietly falls back to NumPy. Anyone can still install it with just NumPy and SciPy, which keeps it accessible.</li>
+        <li><strong>Memory first:</strong> Kernels write into a single output buffer allocated once by Python and handed straight back to NumPy, so there are no temporaries and no copies. At 2 m this matters as much as raw speed.</li>
+        <li>Parallelism, but not everywhere:</strong> Large arrays are split across CPU cores with Rayon. Small arrays run serially, because starting threads costs more than it saves. The switch-over threshold is still provisional, and measuring it properly is the next experiment.</li>
+        <li><strong>Testable without Python:</strong> Each kernel is a pure-Rust core function wrapped by a thin PyO3 layer, so I can test and benchmark the maths with cargo alone.</li>
+        <li><strong>Optional, to stay open:</strong> If the Rust extension isn’t available, the package quietly falls back to NumPy. Anyone can still install it with just NumPy and SciPy, which keeps it accessible.</li>
       </ul>
  </p>
 
     <h4><em>Benchmark results</em></h4>
+<p>To see whether the rewrite was worth it, I benchmarked each kernel against its NumPy equivalent on square arrays from 16 × 16 up to 4096 × 4096 pixels. The largest size is 16.8 million pixels, roughly an 8 × 8 km tile at 2 m or a 41 × 41 km tile at 10 m.</p>
 
-    <p>A 10 m tile that took [x] s and [x] GB in NumPy now takes [x] s and [x] GB.</p>
+<style>
+.tt-bench-wrap{overflow-x:auto;margin:1rem 0}
+.tt-bench{width:100%;border-collapse:collapse;font-size:.9em;font-variant-numeric:tabular-nums}
+.tt-bench th,.tt-bench td{padding:.45rem .6rem;border-bottom:1px solid rgba(0,0,0,.12);text-align:right;white-space:nowrap}
+.tt-bench th:first-child,.tt-bench td:first-child{text-align:left}
+.tt-bench thead th{font-weight:600;border-bottom:2px solid rgba(0,0,0,.25)}
+.tt-bench tfoot td{font-weight:600;border-top:2px solid rgba(0,0,0,.25);border-bottom:0}
+.tt-bench-note{font-size:.85em;opacity:.75;margin-top:-.25rem}
+</style>
+<div class="tt-bench-wrap">
+  <table class="tt-bench">
+    <caption style="caption-side:top;text-align:left;font-weight:600;padding-bottom:.4rem">4096 × 4096 pixels (16.8 million)</caption>
+    <thead>
+      <tr><th>Kernel</th><th>NumPy</th><th>Rust</th><th>Speed-up</th><th>Peak memory (NumPy → Rust)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Luminosity blend</td><td>4,181 ms</td><td>85 ms</td><td>49×</td><td>1.43 GB → 0.61 GB</td></tr>
+      <tr><td>Soft-light blend</td><td>319 ms</td><td>19 ms</td><td>17×</td><td>585 MB → 353 MB</td></tr>
+      <tr><td>Hillshade</td><td>810 ms</td><td>67 ms</td><td>12×</td><td>755 MB → 575 MB</td></tr>
+      <tr><td>Contrast stretch</td><td>163 ms</td><td>19 ms</td><td>9×</td><td>409 MB → 318 MB</td></tr>
+      <tr><td>Curvature</td><td>1,252 ms</td><td>286 ms</td><td>4×</td><td>874 MB → 895 MB</td></tr>
+    </tbody>
+    <tfoot>
+      <tr><td>All five kernels</td><td>6.7 s</td><td>0.48 s</td><td>14×</td><td></td></tr>
+    </tfoot>
+  </table>
+</div>
+<p class="tt-bench-note">Peak memory is the process's peak resident set size, which includes a baseline of roughly 30–60 MB for the Python interpreter.</p>
 
-    <h2>Results: Example</h2>
+<p>Running all five kernels on a full tile went from almost seven seconds to under half a second. The results also told a more interesting story than "Rust is faster":</p>
+<ul>
+  <li><strong>The biggest wins came from removing temporary arrays.</strong> The luminosity blend converts between colour spaces in many small steps, and NumPy allocated a full-size array for each one. Fusing them into a single pass made it 49× faster and cut peak memory from 1.4 GB to 0.6 GB.</li>
+  <li><strong>Curvature barely moved, and that was informative.</strong> It is a neighbourhood calculation that reads a 3 × 3 window around every pixel, so it is limited by memory bandwidth rather than arithmetic. NumPy's version was already running in optimised C. A 4× gain with no memory saving tells me the next improvement is a smarter algorithm, perhaps processing the DEM in tiles, rather than more parallelism.</li>
+  <li><strong>Parallelism has a price.</strong> Kernels switch to multi-threading at 256 × 256 pixels. For the luminosity blend that paid off immediately (43× at that size). For the soft-light blend the speed-up actually fell, to 5×, before jumping to 20× at 512 × 512. One threshold doesn't suit every kernel, so the next step is to tune it for each one.</li>
+</ul>
+
+<h2>Results: Example</h2>
 
 <style>
 .tt-compare{--pos:50%;position:relative;display:block;width:100%;aspect-ratio:730/1094;max-height:80vh;max-height:80svh;margin:1rem 0 .5rem;padding:0;overflow:hidden;border-radius:8px;background:#0b1a26;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:ew-resize}
