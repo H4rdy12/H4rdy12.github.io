@@ -52,8 +52,6 @@ const ringsPole = (fs) => Math.max(...lons(fs)) - Math.min(...lons(fs)) >= 300;
   }
   figures.forEach(([mapEl, features]) => drawGlobe(mapEl, features, pin));
 
-  figures.forEach(([mapEl, features]) => drawGlobe(mapEl, features, pin));
-
   renderLogos(project.properties);   // NEW
 })();
 
