@@ -1,0 +1,97 @@
+/* ---- Before/after compare slider (append to css/style.css) ---- */
+.compare {
+  /* Fit the viewport on any device: never wider than the column,
+     never taller than ~70% of the screen, never huge on desktop. */
+  --ratio: 730 / 1094;
+  --pos: 50%;
+  position: relative;
+  width: min(100%, 480px, calc(70vh * 730 / 1094));
+  width: min(100%, 480px, calc(70svh * 730 / 1094));
+  aspect-ratio: var(--ratio);
+  margin: 1.25rem auto 0.5rem;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #0b1a26;
+  touch-action: pan-y;          /* vertical page scroll still works on phones */
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: ew-resize;
+}
+
+/* Both layers fill the exact same box, so they can never drift apart */
+.compare img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* Top layer is clipped rather than resized */
+.compare .compare-before {
+  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+}
+
+.compare-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--pos);
+  width: 2px;
+  margin-left: -1px;
+  background: #fff;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+  border: 0;
+  padding: 0;
+  cursor: ew-resize;
+}
+
+.compare-handle::after {
+  content: "\2194";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fff;
+  color: #222;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
+  font: 14px/1 system-ui, sans-serif;
+}
+
+.compare-handle:focus-visible {
+  outline: none;
+  background: #ffd24d;
+}
+.compare-handle:focus-visible::after {
+  outline: 3px solid #ffd24d;
+  outline-offset: 2px;
+}
+
+.compare-label {
+  position: absolute;
+  top: 8px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font: clamp(10px, 2.6vw, 12px)/1.6 system-ui, sans-serif;
+  pointer-events: none;
+}
+.compare-label.left  { left: 8px; }
+.compare-label.right { right: 8px; }
+
+.compare-caption {
+  max-width: 480px;
+  margin: 0 auto 1.5rem;
+  font-size: 0.875rem;
+  opacity: 0.8;
+  text-align: center;
+}

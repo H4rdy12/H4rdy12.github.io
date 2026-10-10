@@ -326,3 +326,53 @@ function renderLogos(p) {
   }
   strip.hidden = false;
 }
+
+
+/* ---- Before/after compare slider (append to js/project-page.js) ----
+   Works for any number of <figure class="compare"> elements on a page.
+   Mouse, touch, pen (pointer events) and keyboard (arrow keys) supported. */
+   (function () {
+    document.querySelectorAll(".compare").forEach(function (box) {
+      var handle = box.querySelector(".compare-handle");
+      var active = false;
+      var pos = 50;
+  
+      function set(pct) {
+        pos = Math.max(0, Math.min(100, pct));
+        box.style.setProperty("--pos", pos + "%");
+        if (handle) handle.setAttribute("aria-valuenow", Math.round(pos));
+      }
+  
+      function fromEvent(e) {
+        var r = box.getBoundingClientRect();
+        set(((e.clientX - r.left) / r.width) * 100);
+      }
+  
+      box.addEventListener("pointerdown", function (e) {
+        active = true;
+        box.setPointerCapture(e.pointerId);
+        fromEvent(e);
+      });
+      box.addEventListener("pointermove", function (e) {
+        if (active) fromEvent(e);
+      });
+      ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (t) {
+        box.addEventListener(t, function () { active = false; });
+      });
+  
+      if (handle) {
+        handle.addEventListener("keydown", function (e) {
+          var step = e.shiftKey ? 10 : 2;
+          if (e.key === "ArrowLeft" || e.key === "ArrowDown") set(pos - step);
+          else if (e.key === "ArrowRight" || e.key === "ArrowUp") set(pos + step);
+          else if (e.key === "Home") set(0);
+          else if (e.key === "End") set(100);
+          else return;
+          e.preventDefault();
+        });
+      }
+  
+      set(50);
+    });
+  })();
+  
