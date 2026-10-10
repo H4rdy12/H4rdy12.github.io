@@ -43,7 +43,7 @@
         "partner_logos": [
           { "src": "images/logos/opentopo_logo_text_transparent.png", "alt": "OpenTopography", "url": "https://opentopography.org/" },
           { "src": "images/logos/STAC-01.png", "alt": "STAC", "url": "https://stacspec.org/en" },
-          { "src": "images/logos/PGC_Logo.jpg", "alt": "PGC", "url": "https://www.pgc.umn.edu/" 
+          { "src": "images/logos/PGC_Logo.jpg", "alt": "PGC", "url": "https://www.pgc.umn.edu/"}
         ]
       }
     },
