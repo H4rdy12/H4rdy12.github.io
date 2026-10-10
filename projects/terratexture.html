@@ -135,20 +135,44 @@
     <p>A 10 m tile that took [x] s and [x] GB in NumPy now takes [x] s and [x] GB.</p>
 
     <h2>Results: Example</h2>
-    <figure class="compare" aria-label="Before and after comparison: basemap only versus TerraTexture relief blend">
-      <img class="compare-after"  src="../images/terratexture-relief.webp"
-           alt="West Greenland with TerraTexture curvature relief blended into satellite imagery"
-           width="730" height="1094" loading="lazy" decoding="async">
-      <img class="compare-before" src="../images/terratexture-basemap.webp"
-           alt="West Greenland satellite basemap without relief"
-           width="730" height="1094" loading="lazy" decoding="async">
-      <span class="compare-label left">Basemap only</span>
-      <span class="compare-label right">With relief blend</span>
-      <button class="compare-handle" type="button" role="slider"
-              aria-label="Reveal amount" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"></button>
-    </figure>
-    <p class="compare-caption">Drag across the image. The fjords, outlet glaciers and ice margin only gain depth once curvature is blended in.</p>
-    
+
+<style>
+.tt-compare{--pos:50%;position:relative;display:block;width:100%;aspect-ratio:730/1094;max-height:80vh;max-height:80svh;margin:1rem 0 .5rem;padding:0;overflow:hidden;border-radius:8px;background:#0b1a26;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:ew-resize}
+.tt-compare img{position:absolute;top:0;left:0;width:100%!important;height:100%!important;max-width:none!important;margin:0!important;object-fit:cover;display:block;pointer-events:none;-webkit-user-drag:none}
+.tt-compare .tt-before{clip-path:inset(0 calc(100% - var(--pos)) 0 0)}
+.tt-compare .tt-handle{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;margin:0 0 0 -1px;padding:0;border:0;background:#fff;box-shadow:0 0 4px rgba(0,0,0,.6);cursor:ew-resize;min-width:0;min-height:0}
+.tt-compare .tt-handle::after{content:"\2194";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:32px;height:32px;border-radius:50%;background:#fff;color:#222;box-shadow:0 0 6px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font:14px/1 system-ui,sans-serif}
+.tt-compare .tt-label{position:absolute;top:8px;padding:2px 8px;border-radius:4px;background:rgba(0,0,0,.55);color:#fff;font:clamp(10px,2.6vw,13px)/1.6 system-ui,sans-serif;pointer-events:none}
+.tt-compare .tt-left{left:8px}.tt-compare .tt-right{right:8px}
+.tt-caption{margin:0 0 1.5rem;font-size:.9em;opacity:.8}
+</style>
+
+<figure class="tt-compare" aria-label="Before and after: basemap only versus TerraTexture relief blend">
+  <img class="tt-after" src="terratexture-relief.webp" alt="West Greenland with TerraTexture curvature relief blended into satellite imagery">
+  <img class="tt-before" src="terratexture-basemap.webp" alt="West Greenland satellite basemap without relief">
+  <span class="tt-label tt-left">Basemap only</span>
+  <span class="tt-label tt-right">With relief blend</span>
+  <button class="tt-handle" type="button" role="slider" aria-label="Reveal amount" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"></button>
+</figure>
+<p class="tt-caption">Drag across the image. The fjords, outlet glaciers and ice margin only gain depth once curvature is blended in.</p>
+
+<script>
+(function(){
+  document.querySelectorAll(".tt-compare:not([data-ready])").forEach(function(box){
+    box.setAttribute("data-ready","");
+    var h=box.querySelector(".tt-handle"),on=false,pos=50;
+    function set(p){pos=Math.max(0,Math.min(100,p));box.style.setProperty("--pos",pos+"%");h.setAttribute("aria-valuenow",Math.round(pos));}
+    function at(e){var r=box.getBoundingClientRect();set((e.clientX-r.left)/r.width*100);}
+    box.addEventListener("pointerdown",function(e){on=true;try{box.setPointerCapture(e.pointerId)}catch(_){}at(e);});
+    box.addEventListener("pointermove",function(e){if(on)at(e);});
+    ["pointerup","pointercancel","lostpointercapture"].forEach(function(t){box.addEventListener(t,function(){on=false;});});
+    h.addEventListener("keydown",function(e){var s=e.shiftKey?10:2,k=e.key;
+      if(k==="ArrowLeft"||k==="ArrowDown")set(pos-s);else if(k==="ArrowRight"||k==="ArrowUp")set(pos+s);
+      else if(k==="Home")set(0);else if(k==="End")set(100);else return;e.preventDefault();});
+    set(50);
+  });
+})();
+</script>
 
     <h2>What I learned</h2>
     <p><em>Challenges, what you would do differently, next steps.</em></p>
