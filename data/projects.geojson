@@ -52,7 +52,7 @@
       "geometry": { "type": "Point", "coordinates": [-2.7795, 54.0125] },
       "properties": {
         "id": "duckdb-altimetry",
-        "title": "DuckDB: Querying altimetry at scale",
+        "title": "Querying altimetry at scale",
         "role": "PhD researcher",
         "place": "Lancaster University",
         "category": "Research",
