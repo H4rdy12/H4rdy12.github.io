@@ -56,7 +56,7 @@
         "role": "PhD researcher",
         "place": "Lancaster University",
         "category": "Research",
-        "dates": "2023 – present",
+        "dates": "2023",
         "sort_year": 2023,
         "coverage": "Greenland",
         "summary": "Cut altimetry queries from ~15 minutes on 15 cores to 8 seconds on one, using Parquet and DuckDB across 22.5 billion points.",
