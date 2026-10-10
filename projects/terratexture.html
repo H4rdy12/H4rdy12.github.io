@@ -74,6 +74,8 @@
     </p>
 
     <p>I built one general engine for each style of catalog and made each data product a thin wrapper on top. Moving from a catalog I’d designed myself to ones designed by other people taught me a lot about how STAC behaves in the wild: pagination, inconsistent asset names, and licence metadata I’d never had to think about before.</p>
+   
+    <p>Under the hood, pystac-client handles the catalog search, and GDAL’s /vsicurl/ driver reads only the byte ranges of each COG that fall inside the area of interest, so no full tiles are downloaded.</p>
 
     <h4><em>Making the terrain readable</em></h4>
 
