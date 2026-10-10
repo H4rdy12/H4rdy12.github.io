@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Querying Altimetry at Scale — Dominic Hardy</title>
+  <link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet">
+  <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+  <article class="project-page">
+    <a class="back" href="../index.html">← Back to map</a>
+    <h1>Is DuckDB quacked up for querying altimetry? 🦆</h1>
+    <div class="meta">PhD research · Lancaster University · 2023 – present</div>
+    <div class="tags">
+      <span class="tag">DuckDB</span><span class="tag">Parquet</span><span class="tag">SQL</span>
+      <span class="tag">Python</span><span class="tag">Spatial indexing</span><span class="tag">HPC</span>
+    </div>
+
+    <style>
+      .dq{--old:#8a8a85;--new:#2a78d6;--ink2:color-mix(in srgb,currentColor 68%,transparent);--line:color-mix(in srgb,currentColor 14%,transparent)}
+      .dq-fig{margin:1.25rem 0 1.5rem}
+      .dq-fig h4{margin:0 0 .2rem;font-size:1rem}
+      .dq-sub{margin:0 0 .75rem;font-size:.85em;color:var(--ink2)}
+      .dq-cap{font-size:.9em;opacity:.8;margin-top:.5rem}
+      /* architecture */
+      .dq-arch{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+      @media (max-width:560px){.dq-arch{grid-template-columns:1fr}}
+      .dq-col{border:1px solid var(--line);border-radius:10px;padding:.75rem}
+      .dq-col h5{margin:0 0 .6rem;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2)}
+      .dq-step{border-radius:6px;padding:.45rem .6rem;font-size:.88em;line-height:1.35;border-left:4px solid var(--old);background:color-mix(in srgb,var(--old) 10%,transparent)}
+      .dq-new .dq-step{border-left-color:var(--new);background:color-mix(in srgb,var(--new) 9%,transparent)}
+      .dq-step b{display:block}
+      .dq-step span{color:var(--ink2);font-size:.92em}
+      .dq-arrow{text-align:center;color:var(--ink2);font-size:.9em;line-height:1.4}
+      .dq-out{margin-top:.6rem;font-weight:600;font-size:.95em}
+      .dq-old .dq-out{color:var(--ink2)}
+      .dq-new .dq-out{color:var(--new)}
+      /* bars */
+      .dq-pair{margin:0 0 1rem}
+      .dq-pair-t{font-size:.85em;font-weight:600;margin:0 0 .3rem}
+      .dq-row{display:grid;grid-template-columns:7.5rem 1fr;align-items:center;gap:.5rem;margin:.25rem 0;font-size:.85em}
+      @media (max-width:480px){.dq-row{grid-template-columns:5.5rem 1fr}}
+      .dq-lab{color:var(--ink2);text-align:right}
+      .dq-track{display:flex;align-items:center;gap:.4rem;min-width:0}
+      .dq-bar{height:14px;border-radius:0 4px 4px 0;flex:none}
+      .dq-bar.o{background:var(--old)} .dq-bar.n{background:var(--new)}
+      .dq-val{white-space:nowrap;font-variant-numeric:tabular-nums}
+      .dq-hero{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin:0 0 1.1rem}
+      @media (max-width:560px){.dq-hero{grid-template-columns:1fr}}
+      .dq-stat{border:1px solid var(--line);border-radius:10px;padding:.6rem .75rem}
+      .dq-stat b{display:block;font-size:1.5rem;line-height:1.15;font-variant-numeric:tabular-nums}
+      .dq-stat span{font-size:.82em;color:var(--ink2)}
+      /* table */
+      .dq-tw{overflow-x:auto}
+      .dq-t{width:100%;border-collapse:collapse;font-size:.88em}
+      .dq-t th,.dq-t td{padding:.5rem .55rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+      .dq-t thead th{border-bottom:2px solid color-mix(in srgb,currentColor 30%,transparent);font-weight:600}
+      .dq-t td.num{white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600}
+    </style>
+
+    <h2>Overview</h2>
+    <p>A core part of my PhD is a pipeline that improves the accuracy of hundreds of thousands of satellite-derived elevation models (DEMs) over the ice sheets, by aligning each one to independent satellite altimetry, which measures surface height point by point. For every DEM, the pipeline has to find the altimetry points that fall inside its footprint, within a time window around its acquisition date.</p>
+    <p>That sounds simple until you look at the archive. Over Greenland alone it holds <strong>22.5 billion altimetry points</strong> from multiple satellite missions, stored as thousands of NetCDF files. Finding the points for a single DEM took <strong>around 15 minutes, even spread across 15 CPU cores</strong>. With roughly 740,000 DEMs across both ice sheets, that was simply not workable.</p>
+    <p>This project was about fixing that bottleneck: designing a way to query billions of points quickly, cheaply and without new infrastructure, in a form that works for Greenland and transfers to any other glaciated region. Three years after I first presented the idea to my research group, it is now the group's standard approach and built into other processing workflows.</p>
+
+    <h2>Data coverage</h2>
+    <!-- One globe per coverage area, drawn from data/extents.geojson. The pin marks where the work was done. -->
+    <div id="coverage-maps" class="coverage-grid" data-project="duckdb-altimetry" aria-label="Data coverage maps"></div>
+
+    <h2>Data</h2>
+    <ul>
+      <li><strong>Satellite altimetry archive</strong>: point elevations from multiple missions, including CryoSat-2 (CryoTEMPO EOLIS swath), ICESat and ICESat-2, Envisat and ERS-2, totalling 22.5 billion points over Greenland.</li>
+      <li><strong>DEM archive</strong>: around 740,000 DEMs across both ice sheets (ArcticDEM and REMA strips, and DEMs from ASTER imagery), whose footprints and dates drive the queries.</li>
+      <li><strong>Formats</strong>: originally NetCDF, migrated to Apache Parquet, partitioned by year and month.</li>
+      <li><strong>Coordinate reference system</strong>: EPSG:3413 (NSIDC Polar Stereographic North) for Greenland. The same design applies unchanged with EPSG:3031 for Antarctica.</li>
+    </ul>
+
+    <h2>Methods</h2>
+    <h3>1. The problem was the format, not the code</h3>
+    <p>NetCDF is excellent for what it was designed for: gridded, multi-dimensional climate data. Altimetry is different. It is essentially a long table of points (x, y, elevation, time, error), and NetCDF gave us no way to ask "which points are here, at this time?" without opening and scanning the files themselves. The old workflow found candidate files by date, then looped through them in parallel, reading everything and filtering afterwards.</p>
+
+    <div class="dq dq-fig" role="figure" aria-label="Before and after query architecture">
+      <h4>How a query works, before and after</h4>
+      <p class="dq-sub">The same question: all altimetry within a DEM's footprint, ±1 year of its date.</p>
+      <div class="dq-arch">
+        <div class="dq-col dq-old">
+          <h5>Before: NetCDF</h5>
+          <div class="dq-step"><b>Find files by date</b><span>List NetCDF files whose time range overlaps the window</span></div>
+          <div class="dq-arrow">↓</div>
+          <div class="dq-step"><b>Open and read every file</b><span>All variables, all points, 15 parallel processes</span></div>
+          <div class="dq-arrow">↓</div>
+          <div class="dq-step"><b>Filter in Python</b><span>Discard everything outside the footprint</span></div>
+          <div class="dq-out">≈ 15 minutes · 15 cores</div>
+        </div>
+        <div class="dq-col dq-new">
+          <h5>After: Parquet + DuckDB</h5>
+          <div class="dq-step"><b>Prune partitions</b><span>Skip whole year/month folders outside the window</span></div>
+          <div class="dq-arrow">↓</div>
+          <div class="dq-step"><b>Skip chunks using file statistics</b><span>Min/max of x, y and time let DuckDB skip row groups that can't match</span></div>
+          <div class="dq-arrow">↓</div>
+          <div class="dq-step"><b>Read only the needed columns</b><span>One SQL query, results straight into a DataFrame</span></div>
+          <div class="dq-out">≈ 8 seconds · 1 core</div>
+        </div>
+      </div>
+      <p class="dq-cap">The speed-up comes from not reading data at all: the format lets the query engine rule out most of the archive before touching it.</p>
+    </div>
+
+    <h3>2. From NetCDF to Parquet</h3>
+    <p>Apache Parquet is a columnar format: each variable is stored separately and compressed, and every file carries statistics about its contents. I rewrote the archive as Parquet files partitioned by year and month (Hive-style folders such as <code>year=2019/month=7/</code>), so a query can discard whole time periods just by looking at folder names, and then skip chunks within files using their min/max statistics.</p>
+    <p>Compressing with Brotli shrank the archive by <strong>around 54%</strong> compared with NetCDF. Less than half the disk space for the same data is a big win in itself on shared university storage, before any speed gains.</p>
+
+    <h3>3. Choosing the engine: PostGIS vs DuckDB</h3>
+    <p>The obvious candidate was PostgreSQL with PostGIS, the industry standard for spatial databases, and I tested it. Technically it worked, but it did not fit how a university research group works. Our data lives on local storage and HPC clusters, it is processed by researchers running their own Python scripts, and there is nobody whose job it is to run and maintain a database server. Hosting billions of points on a dedicated server would also have meant new costs.</p>
+    <p>DuckDB fitted that setting. It is serverless and runs inside the Python process, much like SQLite but built for analytics. You point it at the Parquet files and query them with SQL. There is nothing to install beyond a Python package and nothing to administer, and it runs just as well on a laptop as on the HPC. Its spatial extension adds PostGIS-style functions such as <code>ST_DWithin</code> for distance searches.</p>
+
+    <h3>4. Exploring spatial indexes</h3>
+    <p>Partitioning handles time well, but space is harder. As DuckDB's spatial support matured beyond its default index (an ART index, designed for exact-value lookups rather than geometry), I tested the newer options for pushing spatial filtering further:</p>
+    <ul>
+      <li><strong>R-tree</strong>: a bounding-box index for geometries, now built into DuckDB's spatial extension.</li>
+      <li><strong>H3, S2 and A5</strong>: hierarchical discrete global grid systems, which divide the Earth into nested cells with integer IDs. Storing each point's cell ID turns a spatial filter into a fast integer comparison, and sorting the data by cell ID keeps nearby points together in the same file chunks, so more of the archive can be skipped.</li>
+    </ul>
+    <!-- Add your findings here, e.g. which index performed best for footprint queries vs radius searches, and by how much. -->
+
+    <h2>Results</h2>
+    <div class="dq dq-fig" role="figure" aria-label="Benchmark comparison between the NetCDF workflow and Parquet with DuckDB">
+      <h4>One DEM footprint query, before and after</h4>
+      <p class="dq-sub">Bars use a logarithmic scale: each step is ten times larger than the last.</p>
+      <div class="dq-hero">
+        <div class="dq-stat"><b>15 min → 8 s</b><span>Time per query</span></div>
+        <div class="dq-stat"><b>≈ 1,700×</b><span>Less compute per query (15 cores → 1 core)</span></div>
+        <div class="dq-stat"><b>≈ 54%</b><span>Smaller on disk with Brotli-compressed Parquet</span></div>
+      </div>
+
+      <div class="dq-pair">
+        <p class="dq-pair-t">Time per query</p>
+        <div class="dq-row"><span class="dq-lab">NetCDF</span><span class="dq-track"><span class="dq-bar o" style="width:66%"></span><span class="dq-val">≈ 15 min</span></span></div>
+        <div class="dq-row"><span class="dq-lab">DuckDB</span><span class="dq-track"><span class="dq-bar n" style="width:20.2%"></span><span class="dq-val">≈ 8 s</span></span></div>
+      </div>
+      <div class="dq-pair">
+        <p class="dq-pair-t">Compute per query (core-seconds)</p>
+        <div class="dq-row"><span class="dq-lab">NetCDF</span><span class="dq-track"><span class="dq-bar o" style="width:66%"></span><span class="dq-val">13,500</span></span></div>
+        <div class="dq-row"><span class="dq-lab">DuckDB</span><span class="dq-track"><span class="dq-bar n" style="width:14.4%"></span><span class="dq-val">8</span></span></div>
+      </div>
+      <div class="dq-pair">
+        <p class="dq-pair-t">Querying once for every DEM (≈ 740,000), at the same settings</p>
+        <div class="dq-row"><span class="dq-lab">NetCDF</span><span class="dq-track"><span class="dq-bar o" style="width:66%"></span><span class="dq-val">≈ 21 years</span></span></div>
+        <div class="dq-row"><span class="dq-lab">DuckDB</span><span class="dq-track"><span class="dq-bar n" style="width:40.4%"></span><span class="dq-val">≈ 69 days on 1 core</span></span></div>
+      </div>
+      <p class="dq-cap">The archive-scale row is illustrative: it multiplies the single-query times by the number of DEMs. In practice DuckDB queries also run in parallel, so the real figure is a fraction of 69 days. The old approach was not just slow; at ice sheet scale it was impossible.</p>
+    </div>
+
+    <h3>Real queries, real workflows</h3>
+    <p>The design was tested on real research questions, not just synthetic benchmarks:</p>
+    <div class="dq dq-tw">
+      <table class="dq-t">
+        <thead><tr><th>Use case</th><th>Query</th><th>Time</th></tr></thead>
+        <tbody>
+          <tr><td><strong>DEM co-registration</strong> (my PhD pipeline)</td><td>All CryoSat-2 points inside a ~12,000 km² DEM footprint, ±1 year, from 5.2 billion points: 272,397 returned</td><td class="num">≈ 8 s</td></tr>
+          <tr><td><strong>Kalman-filter nodes</strong> (a colleague's workflow)</td><td>All points within 5 km of a node, for each day across a mission's lifetime</td><td class="num">≈ 14 min<br><span style="font-weight:400;opacity:.75">whole mission</span></td></tr>
+          <tr><td><strong>Cross-mission matching</strong></td><td>Nearest ICESat-2 point (strong beams, within 20 m, closest day) for every CryoSat-2 point in an area, July 2019</td><td class="num">≈ 1.5 min</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Spatial plots: add your figures here, e.g. the DEM footprint with the 272,397 returned points, or a node search radius.
+    <figure style="margin:1.25rem 0">
+      <img src="duckdb_content/footprint-query.webp" alt="DEM footprint over Greenland with the altimetry points returned by the query" style="display:block;width:100%;height:auto;border-radius:8px" loading="lazy">
+      <figcaption style="font-size:.9em;opacity:.8;margin-top:.4rem">Case study: altimetry points returned for one DEM footprint in ≈ 8 seconds.</figcaption>
+    </figure>
+    -->
+
+    <h3>Adoption: the harder part</h3>
+    <p>The technology was the quick win. Changing established ways of working took three years. NetCDF workflows were familiar and trusted, so I worked with the group's software engineers to make the case step by step: running real queries on our own data, keeping the transition low-risk, and turning my initial framework into part of the group's core codebase. That last step mattered most. It became the standard way the whole group works rather than one person's tool, and it has since been built into other processing workflows.</p>
+
+    <h3>Beyond speed: why leaving NetCDF future-proofs the archive</h3>
+    <ul>
+      <li><strong>Open and widely supported.</strong> Parquet is read natively by DuckDB, Polars, pandas, Spark, R and the major cloud warehouses, so the data is not tied to any one tool or to custom file-reading code.</li>
+      <li><strong>Cloud-ready without conversion.</strong> If the group moves to the cloud, the same files can go to object storage (such as S3 or Google Cloud Storage) and be queried in place. Because Parquet readers fetch only the byte ranges they need, the statistics-based skipping works over the network too.</li>
+      <li><strong>Scales by adding files.</strong> New missions or months are new partitions. Nothing needs rebuilding, and the same layout works for Greenland, Antarctica or any other glaciated region.</li>
+      <li><strong>Cheaper to keep.</strong> At around 54% smaller, the archive costs less to store and to move, whether on university disks or, later, in cloud storage billed by the gigabyte.</li>
+      <li><strong>Plain SQL.</strong> Queries are short, readable and portable between engines, which lowers the barrier for new researchers.</li>
+    </ul>
+
+    <h2>What I learned</h2>
+    <ul>
+      <li><strong>Fit the architecture to the organisation.</strong> PostGIS is the textbook answer, but a serverless engine on open files suited a research group with no database administrator and data on HPC.</li>
+      <li><strong>Industry patterns, at research-group cost.</strong> The design mirrors how industry handles planetary-scale geospatial data. In Google BigQuery, for example, data is stored in a columnar format, pruned by partition, and indexed spatially with S2 cells. That route bills for storage and for every terabyte scanned, which a university group can't sustain. Parquet with DuckDB applies the same principles on hardware the group already owns, at no extra cost, while keeping the cloud open as a future option.</li>
+      <li><strong>Formats matter as much as code.</strong> The biggest gains came from storing data in a shape that suits the questions being asked, not from writing faster code.</li>
+      <li><strong>Adoption is the real deliverable.</strong> A better system only delivers value once people trust it enough to use it. Demonstrating it on the group's own data, and building it into the shared codebase with the software engineers, was what made it stick.</li>
+    </ul>
+    <p>Next steps include building the best-performing spatial index into the standard partition layout, and extending the archive to more regions and missions.</p>
+
+    <div class="links">
+      <!-- <a class="button" href="https://github.com/H4rdy12" target="_blank" rel="noopener">View code</a> -->
+      <a class="button secondary" href="../index.html">All projects</a>
+    </div>
+
+<!-- Logos come from "logo" and "partner_logos" in data/projects.geojson -->
+<footer id="logo-strip" class="logo-strip" aria-label="Logos" hidden></footer>
+</article>
+
+  <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+  <script src="../js/project-page.js"></script>
+</body>
+</html>

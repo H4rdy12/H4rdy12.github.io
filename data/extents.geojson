@@ -247,6 +247,11 @@
     {"type": "Feature", "properties": {"project": "terratexture", "label": "REMA (Antarctica)", "color": "#228B22", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[-90, -85], [0, -85], [0, -60], [-90, -60], [-90, -85]]]}},
     {"type": "Feature", "properties": {"project": "terratexture", "label": "REMA (Antarctica)", "color": "#228B22", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[0, -85], [90, -85], [90, -60], [0, -60], [0, -85]]]}},
     {"type": "Feature", "properties": {"project": "terratexture", "label": "REMA (Antarctica)", "color": "#228B22", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[90, -85], [179.99, -85], [179.99, -60], [90, -60], [90, -85]]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "REMA (Antarctica)", "color": "#228B22"}, "geometry": {"type": "LineString", "coordinates": [[-180, -60], [-90, -60], [0, -60], [90, -60], [180, -60]]}}
+    {"type": "Feature", "properties": {"project": "terratexture", "label": "REMA (Antarctica)", "color": "#228B22"}, "geometry": {"type": "LineString", "coordinates": [[-180, -60], [-90, -60], [0, -60], [90, -60], [180, -60]]}},
+    {
+      "type": "Feature",
+      "properties": { "project": "duckdb-altimetry", "name": "Greenland Ice Sheet", "description": "22.5 billion altimetry points" },
+      "geometry": { "type": "Polygon", "coordinates": [[[-74,59],[-10,59],[-10,84],[-74,84],[-74,59]]] }
+    }
   ]
 }

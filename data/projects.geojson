@@ -51,6 +51,29 @@
       "type": "Feature",
       "geometry": { "type": "Point", "coordinates": [-2.7855059002424114, 54.009427373987634] },
       "properties": {
+        "id": "duckdb-altimetry",
+        "title": "DuckDB: Querying altimetry at scale",
+        "role": "PhD researcher",
+        "place": "Lancaster University",
+        "category": "Research",
+        "dates": "2023 – present",
+        "sort_year": 2023,
+        "coverage": "Greenland",
+        "summary": "Cut altimetry queries from ~15 minutes on 15 cores to 8 seconds on one, using Parquet and DuckDB across 22.5 billion points.",
+        "tools": ["DuckDB", "SQL", "Parquet", "Python", "Polars", "HPC"],
+        "url": "projects/duckdb-altimetry.html",
+        "logo": "images/logos/DEMSquad_Logo_Team (2).svg",
+        "partner_logos": [
+          { "src": "images/logos/lu-logo.svg", "alt": "Lancaster University", "url": "https://www.lancaster.ac.uk" },
+          { "src": "images/logos/NERC_logo.svg", "alt": "NERC", "url": "https://www.ukri.org/councils/nerc/" },
+          { "src": "images/logos/DuckDB_stack-lightmode.svg", "alt": "DuckDB", "url": "https://duckdb.org/" }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-2.7855059002424114, 54.009427373987634] },
+      "properties": {
         "id": "phd",
         "title": "PhD",
         "role": "PhD researcher",
