@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Earthwave — Your Name</title>
+  <title>Earthwave — Dominic Hardy</title>
   <link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet">
   <link href="../css/style.css" rel="stylesheet">
 </head>
@@ -11,12 +11,32 @@
   <article class="project-page">
     <a class="back" href="../index.html">← Back to map</a>
     <h1>Earthwave</h1>
-    <div class="meta">Job title here · Edinburgh · 20XX – 20XX</div>
-    <div class="tags"><span class="tag">Python</span><span class="tag">Satellite altimetry</span></div>
+    <div class="meta">SPIN Intern (UK Space Agency Space Placements in Industry) · Edinburgh · 2024</div>
+    <div class="tags">
+      <span class="tag">Python</span><span class="tag">CryoSat-2</span><span class="tag">CryoTEMPO</span>
+      <span class="tag">Google Cloud</span><span class="tag">GitHub Actions</span><span class="tag">IMBIE</span>
+    </div>
 
     <h2>Overview</h2>
-    <p>One line on what you did: e.g. processing satellite altimetry to measure ice sheet change.</p>
-    <p><em>Replace this with a short description: what was the problem, who was it for, and why does it matter?</em></p>
+    <p><strong>The brief:</strong> build a production pipeline that turns Earthwave's combined and interpolated CryoTEMPO EOLIS swath and CryoTEMPO Land Ice (POCA) altimetry into monthly surface elevation change and mass change for 2010–2024, aggregated to ice sheet drainage basins, so that Earthwave could contribute its own dataset to the next IMBIE assessment.</p>
+    <p>IMBIE, the Ice Sheet Mass Balance Inter-comparison Exercise, combines mass balance estimates from multiple agencies and research groups into a single consensus record of ice sheet change. To be included, every contribution has to meet IMBIE's data submission standards for format, units, metadata and uncertainties. Meeting those standards was a core requirement of the project.</p>
+
+    <figure style="margin:1rem 0 1.25rem">
+      <a href="earthwave_content/earthwave-imbie-context.webp" target="_blank" rel="noopener">
+        <img src="earthwave_content/earthwave-imbie-context.webp" alt="Poster panel: the aim was to generate monthly mass change time series per ice sheet basin from CryoSat-2 EOLIS swath data and submit them to IMBIE, where many groups' results are combined into one consensus record. Greenland and Antarctica hold 7.4 m and 60 m of sea level rise, and around 600 million people are vulnerable per metre of rise." style="display:block;width:100%;height:auto;border-radius:8px" loading="lazy">
+      </a>
+      <figcaption style="font-size:.9em;opacity:.8;margin-top:.4rem">Left: my pipeline produces a monthly mass change time series for each ice sheet basin, which is submitted to IMBIE. Right: IMBIE compares and combines estimates from Earthwave and other groups into one consensus record and report.</figcaption>
+    </figure>
+    <p style="font-size:.8em;opacity:.7">[1] Otosaka <em>et al.</em> (2023), Mass balance of the Greenland and Antarctic ice sheets from 1992 to 2020, <em>Earth System Science Data</em></a>.</p>
+
+    <h3>Deliverables</h3>
+    <ul>
+      <li>An end-to-end pipeline from gridded altimetry to basin-scale elevation and mass change time series, with uncertainties.</li>
+      <li>Outputs formatted to the IMBIE submission standard: correct column order, units, fixed metadata fields and data-coverage flags.</li>
+      <li>Processing that scaled to the whole ice sheet, running on Earthwave's cloud infrastructure.</li>
+      <li>Tested, reviewed code merged into the company repository (74 commits over the placement).</li>
+      <li>A conference poster presenting the work at SpaceComm, Glasgow, 2024.</li>
+    </ul>
 
     <h2>Data coverage</h2>
     <!-- One globe per coverage area, drawn from data/extents.geojson. The pin marks where the work was done. -->
@@ -24,22 +44,53 @@
 
     <h2>Data</h2>
     <ul>
-      <li><em>Dataset name, source and licence</em></li>
-      <li><em>Coordinate reference system, e.g. EPSG:3413 (NSIDC Polar Stereographic North) or EPSG:3031 (Antarctic Polar Stereographic)</em></li>
+      <li><strong>CryoTEMPO EOLIS</strong> (CryoSat-2 swath) and <strong>CryoTEMPO Land Ice</strong> (CryoSat-2 POCA) elevations, combined and interpolated into a seamless monthly product.</li>
+      <li><strong>RACMO</strong> regional climate model surface mass balance, regridded from 25 km to the 2 km EOLIS grid.</li>
+      <li><strong>Firn densification model</strong>, used to correct elevation change for firn compaction.</li>
+      <li><strong>IMBIE drainage basins</strong> for aggregation. Published estimates (previous IMBIE, Shepherd <em>et al.</em> 2019, Rignot <em>et al.</em> 2019) were used for validation.</li>
     </ul>
 
     <h2>Methods</h2>
-    <p><em>Walk through your workflow: preprocessing, analysis steps, tools and why you chose them.</em></p>
+    <figure style="margin:1rem 0 1.25rem">
+      <a href="earthwave_content/earthwave-pipeline.webp" target="_blank" rel="noopener">
+        <img src="earthwave_content/earthwave-pipeline.webp" alt="Schematic of the five-stage pipeline: grid CryoTEMPO POCA and swath products, transform RACMO and firn model data, calculate elevation change and a dynamic-region mask, calculate dynamic and surface mass balance mass change, and generate basin time series" style="display:block;width:100%;height:auto;border-radius:8px;border:1px solid rgba(0,0,0,.1)" loading="lazy">
+      </a>
+      <figcaption style="font-size:.9em;opacity:.8;margin-top:.4rem">The pipeline I built, from gridded CryoTEMPO altimetry to basin-scale mass change time series. Numbers match the stages below. Click to open full size.</figcaption>
+    </figure>
+    <p>The pipeline runs in five stages:</p>
+    <ol>
+      <li><strong>Ingest and grid:</strong> load the combined EOLIS and POCA elevation-change product on a 2 km monthly grid.</li>
+      <li><strong>Align ancillary data:</strong> reproject and resample RACMO and the firn model onto the same grid (bilinear from 25 km, then nearest neighbour), so every input lines up pixel for pixel.</li>
+      <li><strong>Elevation change:</strong> fit per-pixel linear trends and remove the firn model's signal, leaving the elevation change caused by ice dynamics.</li>
+      <li><strong>Mass change:</strong> generate a mask of dynamically thinning regions, using outlier removal, Gaussian smoothing, median filtering, thresholding and cluster removal by altimeter mode zone. Inside the mask, elevation change × area × ice density gives dynamic mass change. Outside it, mass change is taken from RACMO surface mass balance. The two are combined into total mass change.</li>
+      <li><strong>Basin time series and submission:</strong> aggregate monthly mass change and uncertainty by drainage basin and ice sheet, then pass the results through an automated formatting step that writes them in IMBIE's exact submission format. This step enforces the expected column order, units and data types, adds the required metadata labels (contributor, ice sheet, basin type, method and data coverage), and checks every file against the specification before export, so each submission is consistent and ready to submit with no manual editing.</li>
+    </ol>
 
+    <h3>Engineering at ice sheet scale</h3>
+    <p>Working alongside Earthwave's software engineers, I learned best practices for working with the company's Google Cloud-hosted data: accessing and processing ice sheet-wide datasets efficiently in the cloud rather than on a single machine. My code had to be written within the framework and standards of the organisation's existing codebase, so it could be maintained by the team and extended to Greenland after I left.</p>
+    <p>This was where I learned industry software practice. Every change went through linting, code review by the engineers, and automated CI/CD checks before it was merged. Having experienced developers review my code taught me more about writing clean, maintainable code than any course had, and it has changed how I write code in my own projects since.</p>
+    
     <h2>Results</h2>
-    <!-- <img src="../images/earthwave.png" alt="Map of results"> -->
-    <p><em>Add a map or figure of your results and explain what it shows.</em></p>
+    <figure style="margin:1rem 0">
+      <img src="earthwave_content/earthwave-ais-mass-change.webp" alt="Animated map of Antarctica showing cumulative mass loss building up along the Amundsen Sea coast, above a time series falling to about minus 2000 gigatonnes" style="display:block;width:100%;height:auto;border-radius:8px" loading="lazy">
+      <figcaption style="font-size:.9em;opacity:.8;margin-top:.4rem">Pipeline output: cumulative Antarctic mass change at 2 km resolution, 2011–2022. Loss is concentrated along the Amundsen Sea coast and the Antarctic Peninsula.</figcaption>
+    </figure>
+    <p style="font-size:.9em;padding:.6rem .8rem;border-left:3px solid #e0a100;background:rgba(224,161,0,.08);border-radius:4px;margin:0 0 1.25rem">
+      <strong>Note:</strong> these are preliminary outputs produced during my placement, not official Earthwave or IMBIE results. For the finalised product, see <a href="https://cryotempo-eolis.org/" target="_blank" rel="noopener">Earthwave's published mass change data</a>.
+    </p>
 
     <h2>What I learned</h2>
-    <p><em>Challenges, what you would do differently, next steps.</em></p>
+    <ul>
+      <li><strong>Delivering to an external standard.</strong> Building to IMBIE's specification meant the format, units and uncertainties were as much part of the deliverable as the science.</li>
+      <li><strong>Industry engineering practice.</strong> Linting, code review and CI/CD, learned by working within a professional team's codebase and standards, and now part of how I write all my code.</li>
+      <li><strong>Geospatial data engineering at Earth scale.</strong> Working with billions of altimetry points changed how I think about data: I moved from managing data region by region to managing it at planetary scale. That meant exposure to the methods and systems behind cloud-hosted geospatial data, including spatial indexing and Discrete Global Grid Systems (DGGS), which divide the whole Earth into a consistent hierarchy of cells so that data can be stored, queried and combined efficiently anywhere on the globe.</li>
+      <li><strong>Validation as a gate.</strong> Checking outputs against IMBIE and published records before treating them as finished.</li>
+      <li><strong>Communicating the work.</strong> Presenting the pipeline and its results to an industry and research audience at SpaceComm Glasgow 2024.</li>
+    </ul>
+    <p>Handover items at the end of the placement were to integrate the surface mass balance and firn model uncertainties, refine the dynamic mask for smaller thinning outlet glaciers.</p>
 
     <div class="links">
-      <!-- <a class="button" href="https://github.com/H4rdy12" target="_blank" rel="noopener">View code</a> -->
+      <!-- Code is in Earthwave's private repository -->
       <a class="button secondary" href="../index.html">All projects</a>
     </div>
 
