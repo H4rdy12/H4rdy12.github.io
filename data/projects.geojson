@@ -41,7 +41,7 @@
         "url": "projects/terratexture.html",
         "logo": "images/logos/TerraTexture_logo_1.svg",
         "partner_logos": [
-          { "src": "images/logos/opentopt_logo_text_transparent.png", "alt": "OpenTopography", "url": "https://opentopography.org/" },
+          { "src": "images/logos/opentopo_logo_text_transparent.png", "alt": "OpenTopography", "url": "https://opentopography.org/" },
           { "src": "images/logos/STAC-01.png", "alt": "STAC", "url": "https://stacspec.org/en" }
         ]
       }
