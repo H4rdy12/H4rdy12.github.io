@@ -156,3 +156,37 @@ a { color: var(--accent); }
 .key-dot.key-conference { background: #dc2626; }
 
 .popup .materials { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 4px; }
+
+/* ---------- Coverage map key ---------- */
+.coverage-key {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  font-size: 0.78rem;
+}
+.coverage-key .key-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+}
+.coverage-key button.key-item { cursor: pointer; }
+.coverage-key button.key-item:hover { background: var(--bg); }
+.coverage-key button.key-item.active { font-weight: 600; }
+.coverage-key .key-item i { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; opacity: 0.8; }
+.coverage-key .key-work { color: var(--muted); }
+.coverage-key .key-work i { border-radius: 50%; width: 10px; height: 10px; }
