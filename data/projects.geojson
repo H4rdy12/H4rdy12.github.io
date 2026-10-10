@@ -3,29 +3,6 @@
   "features": [
     {
       "type": "Feature",
-      "geometry": { "type": "Point", "coordinates": [-3.2013201443303636, 55.94690984339875] },
-      "properties": {
-        "id": "earthwave",
-        "title": "Earthwave",
-        "role": "Spinternship",
-        "place": "Edinburgh",
-        "category": "Work",
-        "dates": "2024",
-        "sort_year": 2026,
-        "coverage": "Greenland & Antarctica",
-        "summary": "One line on what you did: e.g. processing satellite altimetry to measure ice sheet change.",
-        "tools": ["Python", "Satellite altimetry"],
-        "url": "projects/earthwave.html",
-        "logo": "images/logos/earthwave_ltd_logo.jpeg",
-        "partner_logos": [
-          { "src": "images/logos/UK_SPACE_AGENCY.svg", "alt": "Lancaster University", "url": "hhttps://www.gov.uk/government/organisations/uk-space-agency" },
-          { "src": "images/logos/SPIN_logo.svg", "alt": "SPIN", "url": "https://sa.catapult.org.uk/space-sector-internships/" },
-          { "src": "images/logos/Catapult_logo.svg", "alt": "CATAPULT", "url": "https://sa.catapult.org.uk/" }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
       "geometry": { "type": "Point", "coordinates": [-3.1883, 55.9533] },
       "properties": {
         "id": "terratexture",
@@ -44,6 +21,29 @@
           { "src": "images/logos/opentopo_logo_text_transparent.png", "alt": "OpenTopography", "url": "https://opentopography.org/" },
           { "src": "images/logos/STAC-01.png", "alt": "STAC", "url": "https://stacspec.org/en" },
           { "src": "images/logos/PGC_Logo.jpg", "alt": "PGC", "url": "https://www.pgc.umn.edu/"}
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-3.2013201443303636, 55.94690984339875] },
+      "properties": {
+        "id": "earthwave",
+        "title": "Earthwave",
+        "role": "Spinternship",
+        "place": "Edinburgh",
+        "category": "Work",
+        "dates": "2024",
+        "sort_year": 2026,
+        "coverage": "Greenland & Antarctica",
+        "summary": "One line on what you did: e.g. processing satellite altimetry to measure ice sheet change.",
+        "tools": ["Python", "Satellite altimetry"],
+        "url": "projects/earthwave.html",
+        "logo": "images/logos/earthwave_ltd_logo.jpeg",
+        "partner_logos": [
+          { "src": "images/logos/UK_SPACE_AGENCY.svg", "alt": "Lancaster University", "url": "hhttps://www.gov.uk/government/organisations/uk-space-agency" },
+          { "src": "images/logos/SPIN_logo.svg", "alt": "SPIN", "url": "https://sa.catapult.org.uk/space-sector-internships/" },
+          { "src": "images/logos/Catapult_logo.svg", "alt": "CATAPULT", "url": "https://sa.catapult.org.uk/" }
         ]
       }
     },
