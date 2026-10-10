@@ -36,7 +36,7 @@
         "dates": "2024",
         "sort_year": 2026,
         "coverage": "Greenland & Antarctica",
-        "summary": "One line on what you did: e.g. processing satellite altimetry to measure ice sheet change.",
+        "summary": "Built a production pipeline turning CryoSat-2 altimetry into monthly ice sheet mass change by basin, delivering data to IMBIE submission standards.",
         "tools": ["Python", "Satellite altimetry"],
         "url": "projects/earthwave.html",
         "logo": "images/logos/earthwave_ltd_logo.jpeg",
