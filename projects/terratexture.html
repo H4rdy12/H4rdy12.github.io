@@ -134,6 +134,102 @@
 <p>To see whether the rewrite was worth it, I benchmarked each kernel against its NumPy equivalent on square arrays from 16 × 16 up to 4096 × 4096 pixels. The largest size is 16.8 million pixels, roughly an 8 × 8 km tile at 2 m or a 41 × 41 km tile at 10 m.</p>
 
 <style>
+  .ttc{--c1:#2a78d6;--c2:#eb6834;--c3:#1baf7a;--c4:#eda100;--c5:#e87ba4;color:inherit;--ink:currentColor;--ink2:color-mix(in srgb,currentColor 68%,transparent);--grid:color-mix(in srgb,currentColor 12%,transparent);--tip:#fff;position:relative;margin:1.25rem 0 1.75rem}
+  .ttc h4{margin:0 0 .15rem;font-size:1rem}
+  .ttc .ttc-sub{margin:0 0 .5rem;font-size:.85em;color:var(--ink2)}
+  .ttc svg{display:block;width:100%;overflow:visible;font-family:system-ui,sans-serif}
+  .ttc .ttc-tip{position:absolute;pointer-events:none;background:#fff;color:#1f1f1d;border:1px solid var(--grid);border-radius:6px;padding:6px 8px;font:12px/1.45 system-ui,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:0;transition:opacity .1s;white-space:nowrap;z-index:2}
+  .ttc .ttc-tip b{font-weight:600}
+  .ttc .ttc-sw{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .ttc .ttc-legend{display:flex;flex-wrap:wrap;gap:.25rem 1rem;font-size:.8em;color:var(--ink2);margin:.35rem 0 0}
+  </style>
+  
+  <div class="ttc" id="ttc-speed">
+    <h4>Speed-up over NumPy by array size</h4>
+    <p class="ttc-sub">Square arrays, 16 × 16 to 4096 × 4096 pixels. Hover or tap for values.</p>
+    <div class="ttc-plot"></div>
+    <div class="ttc-legend"></div>
+    <div class="ttc-tip"></div>
+  </div>
+  
+  <div class="ttc" id="ttc-mem">
+    <h4>Peak memory at 4096 × 4096 pixels</h4>
+    <p class="ttc-sub">Hollow ring = NumPy, filled dot = Rust. Shorter is better.</p>
+    <div class="ttc-plot"></div>
+    <div class="ttc-tip"></div>
+  </div>
+  
+  <script>
+  (function(){
+    var NS="http://www.w3.org/2000/svg";
+    var sizes=[16,64,128,256,512,1024,2048,4096];
+    var K=[
+      {n:"Luminosity blend",c:"--c1",sp:[23.6,10.3,9.0,43.3,29.6,36.2,38.7,49.2],np:1433.7,rs:608.5},
+      {n:"Soft-light blend",c:"--c2",sp:[19.0,10.2,8.8,5.4,19.5,17.2,19.7,16.7],np:584.8,rs:352.6},
+      {n:"Hillshade",c:"--c3",sp:[53.1,20.6,19.1,8.4,12.2,12.7,14.0,12.0],np:755.1,rs:574.8},
+      {n:"Contrast stretch",c:"--c4",sp:[52.4,11.5,5.3,2.6,3.9,5.4,7.8,8.6],np:409.4,rs:318.3},
+      {n:"Curvature",c:"--c5",sp:[18.8,2.2,1.4,2.3,2.6,3.8,4.0,4.4],np:874.4,rs:894.5}
+    ];
+    function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+    function txt(p,x,y,s,a){var t=el("text",Object.assign({x:x,y:y,fill:"var(--ink2)","font-size":11},a||{}),p);t.textContent=s;return t;}
+    function col(box,v){return getComputedStyle(box).getPropertyValue(v).trim();}
+    function tipAt(box,tip,html,x,y){tip.innerHTML=html;tip.style.opacity=1;var w=tip.offsetWidth,W=box.clientWidth;tip.style.left=Math.max(0,Math.min(W-w,x+12))+"px";tip.style.top=(y-10)+"px";}
+  
+    function speed(){
+      var box=document.getElementById("ttc-speed"),plot=box.querySelector(".ttc-plot"),tip=box.querySelector(".ttc-tip");
+      var W=plot.clientWidth,H=W<480?240:290,m={l:34,r:W<480?92:120,t:10,b:34};
+      var pw=W-m.l-m.r,ph=H-m.t-m.b,yMax=55;
+      plot.innerHTML="";var s=el("svg",{viewBox:"0 0 "+W+" "+H,height:H,role:"img","aria-label":"Line chart of Rust speed-up over NumPy for five kernels across array sizes"},plot);
+      var X=function(i){return m.l+i/(sizes.length-1)*pw},Y=function(v){return m.t+ph-v/yMax*ph};
+      [0,10,20,30,40,50].forEach(function(v){el("line",{x1:m.l,x2:m.l+pw,y1:Y(v),y2:Y(v),stroke:"var(--grid)"},s);txt(s,m.l-6,Y(v)+4,v+"×",{"text-anchor":"end"});});
+      sizes.forEach(function(sz,i){if(W<480&&[0,3,5,7].indexOf(i)<0)return;txt(s,X(i),m.t+ph+16,sz,{"text-anchor":"middle"});});
+      txt(s,m.l+pw/2,H-2,"Pixels per side (log scale)",{"text-anchor":"middle"});
+      var tx=X(3);el("line",{x1:tx,x2:tx,y1:m.t,y2:m.t+ph,stroke:"var(--ink2)","stroke-dasharray":"3 3","stroke-width":1},s);
+      txt(s,tx+5,m.t+11,"Rust goes parallel",{"font-size":10.5});
+      var ends=[];
+      K.forEach(function(k){var c=col(box,k.c);
+        el("path",{d:k.sp.map(function(v,i){return(i?"L":"M")+X(i)+","+Y(v)}).join(""),fill:"none",stroke:c,"stroke-width":2,"stroke-linejoin":"round"},s);
+        k.sp.forEach(function(v,i){el("circle",{cx:X(i),cy:Y(v),r:3.5,fill:c,stroke:"var(--tip)","stroke-width":1.5},s);});
+        ends.push({k:k,c:c,y:Y(k.sp[7])});});
+      ends.sort(function(a,b){return a.y-b.y});for(var i=1;i<ends.length;i++)if(ends[i].y-ends[i-1].y<13)ends[i].y=ends[i-1].y+13;
+      ends.forEach(function(e){var short=e.k.n.split(" ")[0];txt(s,m.l+pw+8,e.y+4,(W<480?short:e.k.n)+" "+Math.round(e.k.sp[7])+"×",{fill:"var(--ink)"});});
+      var cross=el("line",{y1:m.t,y2:m.t+ph,stroke:"var(--ink2)","stroke-width":1,opacity:0},s);
+      var hit=el("rect",{x:m.l-10,y:m.t,width:pw+20,height:ph,fill:"transparent"},s);
+      function move(e){var r=s.getBoundingClientRect(),px=e.clientX-r.left,i=Math.max(0,Math.min(7,Math.round((px-m.l)/pw*7)));
+        cross.setAttribute("x1",X(i));cross.setAttribute("x2",X(i));cross.setAttribute("opacity",.5);
+        var rows=K.slice().sort(function(a,b){return b.sp[i]-a.sp[i]}).map(function(k){return'<span class="ttc-sw" style="background:'+col(box,k.c)+'"></span>'+k.n+" <b>"+k.sp[i].toFixed(1)+"×</b>"}).join("<br>");
+        tipAt(box,tip,"<b>"+sizes[i]+" × "+sizes[i]+"</b><br>"+rows,X(i),e.clientY-box.getBoundingClientRect().top-60);}
+      function out(){cross.setAttribute("opacity",0);tip.style.opacity=0;}
+      hit.addEventListener("pointermove",move);hit.addEventListener("pointerdown",move);hit.addEventListener("pointerleave",out);
+      box.querySelector(".ttc-legend").innerHTML=K.map(function(k){return'<span><span class="ttc-sw" style="background:'+col(box,k.c)+'"></span>'+k.n+"</span>"}).join("");
+    }
+  
+    function mem(){
+      var box=document.getElementById("ttc-mem"),plot=box.querySelector(".ttc-plot"),tip=box.querySelector(".ttc-tip");
+      var rows=K.slice().sort(function(a,b){return b.np-a.np});
+      var W=plot.clientWidth,lab=W<480?78:120,m={l:lab,r:16,t:6,b:30},rh=34,H=m.t+m.b+rows.length*rh,pw=W-m.l-m.r,xMax=1500;
+      plot.innerHTML="";var s=el("svg",{viewBox:"0 0 "+W+" "+H,height:H,role:"img","aria-label":"Peak memory for NumPy versus Rust for each kernel at 4096 by 4096 pixels"},plot);
+      var X=function(v){return m.l+v/xMax*pw};
+      [0,500,1000,1500].forEach(function(v){el("line",{x1:X(v),x2:X(v),y1:m.t,y2:H-m.b,stroke:"var(--grid)"},s);txt(s,X(v),H-m.b+15,v===0?"0":(v/1000)+" GB",{"text-anchor":"middle"});});
+      rows.forEach(function(k,i){var y=m.t+i*rh+rh/2,c=col(box,k.c);
+        txt(s,m.l-8,y+4,W<480?k.n.split(" ")[0]:k.n,{"text-anchor":"end",fill:"var(--ink)"});
+        el("line",{x1:X(k.np),x2:X(k.rs),y1:y,y2:y,stroke:c,"stroke-width":2,opacity:.55},s);
+        el("circle",{cx:X(k.np),cy:y,r:5,fill:"var(--tip)",stroke:c,"stroke-width":2},s);
+        el("circle",{cx:X(k.rs),cy:y,r:5.5,fill:c,stroke:"var(--tip)","stroke-width":1.5},s);
+        var hit=el("rect",{x:0,y:y-rh/2,width:W,height:rh,fill:"transparent"},s);
+        function show(e){var d=k.rs-k.np,pct=Math.round(d/k.np*100);
+          tipAt(box,tip,'<span class="ttc-sw" style="background:'+c+'"></span><b>'+k.n+"</b><br>NumPy "+Math.round(k.np)+" MB<br>Rust "+Math.round(k.rs)+" MB <b>("+(pct>0?"+":"")+pct+"%)</b>",X(Math.max(k.np,k.rs)),y-20);}
+        hit.addEventListener("pointermove",show);hit.addEventListener("pointerdown",show);hit.addEventListener("pointerleave",function(){tip.style.opacity=0;});
+      });
+    }
+  
+    function draw(){speed();mem();}
+    draw();
+    var t;window.addEventListener("resize",function(){clearTimeout(t);t=setTimeout(draw,120);});
+  })();
+  </script>
+
+<style>
 .tt-bench-wrap{overflow-x:auto;margin:1rem 0}
 .tt-bench{width:100%;border-collapse:collapse;font-size:.9em;font-variant-numeric:tabular-nums}
 .tt-bench th,.tt-bench td{padding:.45rem .6rem;border-bottom:1px solid rgba(0,0,0,.12);text-align:right;white-space:nowrap}
