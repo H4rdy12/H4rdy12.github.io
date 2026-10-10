@@ -34,14 +34,14 @@
         "place": "Edinburgh",
         "category": "Work",
         "dates": "2024",
-        "sort_year": 2026,
+        "sort_year": 2024,
         "coverage": "Greenland & Antarctica",
         "summary": "Built a production pipeline turning CryoSat-2 altimetry into monthly ice sheet mass change by basin, delivering data to IMBIE submission standards.",
         "tools": ["Python", "Satellite altimetry"],
         "url": "projects/earthwave.html",
         "logo": "images/logos/earthwave_ltd_logo.jpeg",
         "partner_logos": [
-          { "src": "images/logos/UK_SPACE_AGENCY.svg", "alt": "Lancaster University", "url": "hhttps://www.gov.uk/government/organisations/uk-space-agency" },
+          { "src": "images/logos/UK_SPACE_AGENCY.svg", "alt": "UK Space Agency", "url": "https://www.gov.uk/government/organisations/uk-space-agency" },
           { "src": "images/logos/SPIN_logo.svg", "alt": "SPIN", "url": "https://sa.catapult.org.uk/space-sector-internships/" },
           { "src": "images/logos/Catapult_logo.svg", "alt": "CATAPULT", "url": "https://sa.catapult.org.uk/" }
         ]
@@ -49,7 +49,7 @@
     },
     {
       "type": "Feature",
-      "geometry": { "type": "Point", "coordinates": [-2.7855059002424114, 54.009427373987634] },
+      "geometry": { "type": "Point", "coordinates": [-2.7795, 54.0125] },
       "properties": {
         "id": "duckdb-altimetry",
         "title": "DuckDB: Querying altimetry at scale",
@@ -80,7 +80,7 @@
         "place": "Lancaster University",
         "category": "Research",
         "dates": "2022 – 2026",
-        "sort_year": 2023,
+        "sort_year": 2022,
         "coverage": "Greenland",
         "summary": "One line on your thesis topic and the Greenland data you worked with.",
         "tools": ["Python", "QGIS"],
