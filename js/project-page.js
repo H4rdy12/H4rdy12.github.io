@@ -284,9 +284,13 @@ function addKey(el, map, groups, pin, coverageText) {
 
 function flyToGroup(map, g, animate) {
   const move = animate ? 'flyTo' : 'jumpTo';
-  if (ringsPole(g.features)) {
-    // Look down on the pole. Globe zoom is scaled by latitude, so keep it low near the poles.
-    const south = lats(g.features)[0] < 0;
+  const ls = lats(g.features);
+  if (ringsPole(g.features) && Math.min(...ls) < 0 && Math.max(...ls) > 0) {
+    // A band round the whole globe (e.g. SRTM): show the full globe, centred on the work location
+    map[move]({ center: [map.getCenter().lng, 20], zoom: 1.1 });
+  } else if (ringsPole(g.features)) {
+    // A cap round a pole: look down on the pole. Globe zoom is scaled by latitude, so keep it low.
+    const south = ls[0] < 0;
     map[move]({ center: [0, south ? -72 : 72], zoom: 0.4 });
   } else {
     const b = new maplibregl.LngLatBounds();
