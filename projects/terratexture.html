@@ -43,12 +43,98 @@
 
     <h2>Data</h2>
     <ul>
-      <li><em>Dataset name, source and licence</em></li>
-      <li><em>Coordinate reference system, e.g. EPSG:3413 (NSIDC Polar Stereographic North) or EPSG:3031 (Antarctic Polar Stereographic)</em></li>
+      <li><em></em>ArcticDEM and REMA mosaics at 2 m, 10 m and 32 m, from the Polar Geospatial Center, University of Minnesota. Licensed CC BY 4.0, with PGC’s acknowledgement policy.</em></li>
+      <li><em>OpenTopography raster collections, including SRTM GL1, Copernicus GLO-30, NASADEM and many regional lidar DEMs. Licensing varies by collection and is read from each collection’s STAC metadata.</em></li>
+      <li><em>Basemap imagery via contextily. Esri World Imagery is the default, and any keyless provider works.</em></li>
+      <li><em>Coordinate reference systems:</em></li>
+          <ul>
+            <li><em>EPSG:3413 (NSIDC Polar Stereographic North) for ArcticDEM</em></li>
+            <li><em>EPSG:3031 (Antarctic Polar Stereographic) for REMA</em></li>
+            <li><em>EPSG:4326 for OpenTopography bounds</em></li>
+            <li><em>EPSG:3857 for basemap tiles</em></li>
+          </ul>
+
+
     </ul>
 
-    <h2>Methods</h2>
-    <p><em>Walk through your workflow: preprocessing, analysis steps, tools and why you chose them.</em></p>
+    <h2>The Journey</h2>
+    <h4><em>Starting from a figure I didn’t like</em></h4>
+
+    <p>It began with one of my own PhD figures. It was a map of elevation change that was scientifically correct but visually flat. The colours told you something was happening; nothing told you where in the landscape it was happening. Hillshades lived in my analysis notebooks but rarely made it into the final maps. Imagery from contextily gave context, but no sense of relief.</p>
+    <p>I wanted both at once: a familiar basemap with the terrain pressing up through it, acting as a stage for scientific data rather than a decoration.</p>
+
+    <h3><em>CHALLENGE 1: from private catalogs to public ones</em></h4>
+    <p>During my PhD, I organised my DEMs through self-built STAC catalogs on local storage. That worked well for me, but it meant my maps depended on data and infrastructure nobody else could access. If someone wanted to recreate a figure, they’d first have to rebuild my catalog.</p>
+
+    <p>So the first experiment was to throw that away and see whether I could do everything from public, unauthenticated STAC catalogs instead. That would keep the whole pipeline open source, from the data through to the final figure.</p>
+
+    <p>
+      It turned out to be two problems rather than one, because public catalogs come in two flavours:
+      <ul>
+        <li>Dynamic (PGC, for ArcticDEM and REMA). A STAC API with a search endpoint. You send a bounding box, the server does the spatial search, and you page through the results.</li>
+        <li>Static (OpenTopography). A tree of JSON files with no search endpoint at all. You have to walk through the collections yourself and filter tiles by bounding box locally.</li>
+      </ul>
+    </p>
+
+    <p>I built one general engine for each style of catalog and made each data product a thin wrapper on top. Moving from a catalog I’d designed myself to ones designed by other people taught me a lot about how STAC behaves in the wild: pagination, inconsistent asset names, and licence metadata I’d never had to think about before.</p>
+
+    <h4><em>Making the terrain readable</em></h4>
+
+    <p>
+      To pick out the landforms, the tool computes two kinds of curvature, following Zevenbergen & Thorne (1987):
+      <ul>
+        <li>Profile curvature shows where slopes steepen or flatten.</li>
+        <li>Planform curvature shows where flow converges into channels or spreads across ridges.</li>
+      </ul>
+    </p>
+
+    <p>These are blended with an analytical hillshade using soft-light and luminosity blend modes, then draped over the contextily basemap. A lot of this was trial and error: tuning the contrast and blend strength until the terrain read clearly without overwhelming the colours of the data on top.</p>
+
+    <p>The final step burns a scientific layer, such as elevation change, directly onto the relief. That was exactly the map I’d wanted during my PhD.</p>
+
+
+    <h3><em>CHALLENGE 2: Exploring rust for speed and memory</em></h3>
+
+    <p>Everything worked in NumPy at 32 m. At 2–10 m, it started to struggle, and it was memory, not just time, that became the limit.</p>
+
+    <p>
+      The scale is the problem. A 50 × 50 km area is:
+      <ul>
+        <li>about 25 million pixels at 10 m, or roughly 100 MB per float32 array</li>
+        <li>about 625 million pixels at 2 m, or roughly 2.5 GB per array</li>
+      </ul>
+    </p>
+
+    <p>NumPy evaluates a formula one operation at a time, creating a full-size temporary array at each step. My curvature and blend maths had many steps. A single blend could briefly hold several copies of an already huge array, which was enough to exhaust memory on a laptop.</p>
+
+    <p>
+      That made it a good excuse to learn Rust. I rewrote the hot paths as fused kernels, where each kernel does the whole calculation for a pixel in one pass, with no intermediate arrays. There are five:
+
+      <ul>
+        <li>Soft-light blend</li>
+        <li>Luminosity blend</li>
+        <li>Profile and planform curvature</li>
+        <li>Hillshade</li>
+        <li>Standard-deviation contrast stretch</li>
+      </ul>
+    </p>
+
+    <p>
+      Things I explored along the way:
+      
+      <ul>
+        <li>Memory first. Kernels write into a single output buffer allocated once by Python and handed straight back to NumPy, so there are no temporaries and no copies. At 2 m this matters as much as raw speed.</li>
+        <li>Parallelism, but not everywhere. Large arrays are split across CPU cores with Rayon. Small arrays run serially, because starting threads costs more than it saves. The switch-over threshold is still provisional, and measuring it properly is the next experiment.</li>
+        <li>Testable without Python. Each kernel is a pure-Rust core function wrapped by a thin PyO3 layer, so I can test and benchmark the maths with cargo alone.</li>
+        <li>Optional, to stay open. If the Rust extension isn’t available, the package quietly falls back to NumPy. Anyone can still install it with just NumPy and SciPy, which keeps it accessible.</li>
+      </ul>
+ </p>
+
+    <h4><em>Benchmark results</em></h4>
+
+
+
+    <p>A 10 m tile that took [x] s and [x] GB in NumPy now takes [x] s and [x] GB.</p>
 
     <h2>Results</h2>
     <!-- <img src="../images/terratexture.png" alt="Map of results"> -->
@@ -57,13 +143,13 @@
     <h2>What I learned</h2>
     <p><em>Challenges, what you would do differently, next steps.</em></p>
     <ul>
-      <li>Context is part of the science. A map that hides the topography makes readers work harder to understand the result.</li>
-      <li>Open by default changes the design. Swapping my private catalogs for public ones forced me to handle other people’s conventions and licences. The payoff is that anyone can reproduce the maps.</li>
-      <li>Real-world STAC is messier than the spec. Supporting both dynamic and static catalogs pushed me towards cleaner abstractions.</li>
-      <li>With cloud-native data, the fastest download is the one you don’t make.</li>
-      <li>At high resolution, memory is the real constraint. Rust’s fused kernels helped as much by avoiding temporary arrays as by running faster.</li>
-      <li>Keep the fast path optional. The NumPy fallback means performance work never costs accessibility.</li>
-      <li>Treat side projects like production code. CI/CD that runs formatting checks and Rust tests and deploys the docs automatically lets me experiment freely.</li>
+      <li><strong>Context is part of the science.</strong> A map that hides the topography makes readers work harder to understand the result.</li>
+      <li><strong>Open by default changes the design.</strong> Swapping my private catalogs for public ones forced me to handle other people’s conventions and licences. The payoff is that anyone can reproduce the maps.</li>
+      <li><strong>Real-world STAC is messier than the spec.</strong> Supporting both dynamic and static catalogs pushed me towards cleaner abstractions.</li>
+      <li>With <strong>cloud-native data</strong>, the fastest download is the one you don’t make.</li>
+      <li><strong>At high resolution, memory is the real constraint</strong>. Rust’s fused kernels helped as much by avoiding temporary arrays as by running faster.</li>
+      <li><strong>Keep the fast path optional.</strong> The NumPy fallback means performance work never costs accessibility.</li>
+      <li><strong>Treat side projects like production code.</strong> CI/CD that runs formatting checks and Rust tests and deploys the docs automatically lets me experiment freely.</li>
     </ul>
 
     <h2>Where next:</h2>
