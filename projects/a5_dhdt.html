@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ice-Sheet Change on an Equal-Area Grid: A5 + DuckDB · Dominic Hardy</title>
+  <link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet">
+  <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+  <article class="project-page">
+    <a class="back" href="../index.html">← Back to map</a>
+    <h1>Fitting ice-sheet change one pentagon at a time ⬠</h1>
+    <!-- TODO: check the dates -->
+    <div class="meta">PhD research · Lancaster University · 2026</div>
+    <div class="tags">
+      <span class="tag">DuckDB</span><span class="tag">A5</span><span class="tag">DGGS</span>
+      <span class="tag">SQL</span><span class="tag">Python</span><span class="tag">NumPy</span>
+      <span class="tag">CryoSat-2</span><span class="tag">ICESat-2</span><span class="tag">MapLibre</span>
+    </div>
+
+    <style>
+      .dq{--old:#8a8a85;--new:#2a78d6;--ink2:color-mix(in srgb,currentColor 68%,transparent);--line:color-mix(in srgb,currentColor 14%,transparent)}
+      .dq-fig{margin:1.25rem 0 1.5rem}
+      .dq-fig h4{margin:0 0 .2rem;font-size:1rem}
+      .dq-sub{margin:0 0 .75rem;font-size:.85em;color:var(--ink2)}
+      .dq-cap{font-size:.9em;opacity:.8;margin-top:.5rem}
+      /* architecture */
+      .dq-arch{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+      @media (max-width:560px){.dq-arch{grid-template-columns:1fr}}
+      .dq-col{border:1px solid var(--line);border-radius:10px;padding:.75rem}
+      .dq-col h5{margin:0 0 .6rem;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2)}
+      .dq-step{border-radius:6px;padding:.45rem .6rem;font-size:.88em;line-height:1.35;border-left:4px solid var(--old);background:color-mix(in srgb,var(--old) 10%,transparent)}
+      .dq-new .dq-step{border-left-color:var(--new);background:color-mix(in srgb,var(--new) 9%,transparent)}
+      .dq-step b{display:block}
+      .dq-step span{color:var(--ink2);font-size:.92em}
+      .dq-arrow{text-align:center;color:var(--ink2);font-size:.9em;line-height:1.4}
+      .dq-out{margin-top:.6rem;font-weight:600;font-size:.95em}
+      .dq-old .dq-out{color:var(--ink2)}
+      .dq-new .dq-out{color:var(--new)}
+      /* stats */
+      .dq-hero{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin:0 0 1.1rem}
+      @media (max-width:560px){.dq-hero{grid-template-columns:1fr}}
+      .dq-stat{border:1px solid var(--line);border-radius:10px;padding:.6rem .75rem}
+      .dq-stat b{display:block;font-size:1.5rem;line-height:1.15;font-variant-numeric:tabular-nums}
+      .dq-stat span{font-size:.82em;color:var(--ink2)}
+      /* table */
+      .dq-tw{overflow-x:auto}
+      .dq-t{width:100%;border-collapse:collapse;font-size:.88em}
+      .dq-t th,.dq-t td{padding:.5rem .55rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+      .dq-t thead th{border-bottom:2px solid color-mix(in srgb,currentColor 30%,transparent);font-weight:600}
+      .dq-t td.num{white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600}
+      .dq-t tr.hl td{background:color-mix(in srgb,var(--new) 8%,transparent)}
+      /* equations + code */
+      .dq-eq{font-family:"Cambria Math","STIX Two Math",Georgia,serif;font-size:1.05em;text-align:center;
+             padding:.7rem;margin:.8rem 0;border:1px solid var(--line);border-radius:8px;overflow-x:auto}
+      .dq-code{font-size:.82em;line-height:1.45;padding:.75rem .9rem;border-radius:8px;overflow-x:auto;
+               background:color-mix(in srgb,currentColor 6%,transparent)}
+      .dq-tbd{color:var(--ink2);font-style:italic}
+      /* map placeholder */
+      .dq-map{position:relative;aspect-ratio:4/3;border:1px dashed color-mix(in srgb,currentColor 30%,transparent);
+              border-radius:10px;display:flex;align-items:center;justify-content:center;text-align:center;
+              padding:1rem;color:var(--ink2);font-size:.92em}
+      .dq-zoom{display:grid;grid-template-columns:repeat(6,1fr);gap:.35rem;margin:.6rem 0 0;font-size:.8em;text-align:center}
+      @media (max-width:560px){.dq-zoom{grid-template-columns:repeat(3,1fr)}}
+      .dq-zoom div{border:1px solid var(--line);border-radius:6px;padding:.35rem .2rem}
+      .dq-zoom b{display:block;font-variant-numeric:tabular-nums}
+    </style>
+
+    <!-- ===================================================================== -->
+    <h2>Overview</h2>
+    <p>Satellite altimeters don't sample the Greenland Ice Sheet evenly. Their orbits converge towards the north, so high-latitude regions such as the Northeast Greenland Ice Stream (NEGIS) are crossed far more often than southern outlet glaciers such as Helheim. That matters for my PhD: the more points a region gets, the more reliably we can measure how fast its surface is rising or falling (<em>dh/dt</em>).</p>
+    <p>To show this fairly, I needed two things: a way to compare <strong>data density</strong> between regions without the grid itself biasing the answer, and a way to fit <strong>dh/dt in every grid cell</strong> across the ice sheet quickly enough to iterate on the method. This project does both, by combining a new <strong>equal-area discrete global grid, A5</strong>, with <strong>DuckDB</strong>, the query engine behind my <a href="duckdb-altimetry.html">altimetry archive work</a>. <!-- TODO: check the link to the DuckDB project page --></p>
+    <p>The result: per-cell elevation-change fits over ~94 million points per mission, run as a handful of SQL passes, with no Python loop over cells and no data loaded into memory up front.</p>
+
+    <h2>Data coverage</h2>
+    <!-- One globe per coverage area, drawn from data/extents.geojson. The pin marks where the work was done.
+         TODO: add an "a5-dhdt" entry to data/extents.geojson and data/projects.geojson -->
+    <div id="coverage-maps" class="coverage-grid" data-project="a5-dhdt" aria-label="Data coverage maps"></div>
+
+    <h2>Data</h2>
+    <ul>
+      <li><strong>Satellite altimetry</strong>: CryoSat-2 (CryoTEMPO, Baseline D) and ICESat-2 point elevations over Greenland, roughly 94 million points per mission, stored in a DuckDB database and queried in place.</li>
+      <li><strong>Study sites</strong>: NEGIS, Upernavik Isstrøm (UI), Russell Glacier and Helheim Glacier, spanning roughly 66–80°N.</li>
+      <li><strong>Grid</strong>: A5 cells at resolutions 9–12 (130 km² down to 2 km²). EPSG:3413 (NSIDC Polar Stereographic North) is used only to draw the maps.</li>
+    </ul>
+
+    <!-- ===================================================================== -->
+    <h2>Methods</h2>
+
+    <h3>1. Why the grid matters</h3>
+    <p>To compare data density between regions, you count points per cell and divide by the cell's area. That only works if the cells really are the area you think they are. A square grid on a polar map isn't: map projections stretch the ground, so equal squares on the map cover different amounts of ice. Popular global grids such as H3 have the same problem in a different form. A5 is built so that every cell at a given resolution covers <em>exactly</em> the same area, anywhere on Earth.</p>
+
+    <div class="dq dq-fig" role="figure" aria-label="How much cell areas vary across Greenland for three grids">
+      <h4>How much does cell area vary across Greenland?</h4>
+      <p class="dq-sub">Same nominal cell size, measured across the ice sheet's latitude range (60–83°N).</p>
+      <div class="dq-tw">
+        <table class="dq-t">
+          <thead><tr><th>Grid</th><th>Cell shape</th><th>Area variation across Greenland</th><th>Helheim (66°N) vs NEGIS (79°N)</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Square grid in EPSG:3413</strong></td><td>Square</td><td class="num">≈ 14%</td><td>True cell area differs by ≈ 7%</td></tr>
+            <tr><td><strong>H3</strong></td><td>Hexagon</td><td class="num">≈ 47%</td><td>Depends where each site falls on H3's base icosahedron</td></tr>
+            <tr class="hl"><td><strong>A5</strong></td><td>Pentagon</td><td class="num">0%</td><td>Identical by construction</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="dq-cap">EPSG:3413 from the projection's areal scale factor (0.948–1.080 between 83°N and 60°N); H3 from cell areas at resolutions 6 and 7 sampled over a box around Greenland (h3 v4). A grid that varies by a few percent can still shift a density comparison by more than the signal you're trying to show.</p>
+    </div>
+
+    <p>Being a <strong>discrete global grid system (DGGS)</strong> brings three more benefits that turned out to matter as much as equal area:</p>
+    <ul>
+      <li><strong>Cells are integers.</strong> Every point gets a 64-bit cell ID, so grouping, filtering and joining datasets become fast integer operations rather than geometry tests.</li>
+      <li><strong>Cells nest.</strong> Above the coarsest level, each A5 cell contains exactly four children at the next resolution. Counts computed once at a fine resolution can be added up to any coarser resolution, with no second pass over the raw data.</li>
+      <li><strong>No projection to choose.</strong> Cells are defined on the globe, so the same pipeline works unchanged for Antarctica or anywhere else.</li>
+    </ul>
+
+    <h3>2. Data density: counting points per cell</h3>
+    <p>The first output is a map of how many measurements each part of the ice sheet receives, in points per km² per year. DuckDB scans the database once, assigns every point to an A5 cell with the <code>a5</code> community extension, and counts per cell. Coarser maps come from rolling those counts up to parent cells.</p>
+    <!-- TODO: add the density figure (greenland_data_density_a5.png → .webp)
+    <figure style="margin:1.25rem 0">
+      <img src="a5_content/data-density.webp" alt="Greenland data density on A5 cells, with zoom panels for NEGIS, UI, Russell and Helheim and monthly density heatmaps" style="display:block;width:100%;height:auto;border-radius:8px" loading="lazy">
+      <figcaption style="font-size:.9em;opacity:.8;margin-top:.4rem">Data density on equal-area A5 cells. Panels b–e: mean density per site, per month.</figcaption>
+    </figure>
+    -->
+
+    <h3>3. The DuckDB trick: fitting from summary statistics</h3>
+    <p>Fitting dh/dt means running a small regression in every cell: hundreds of thousands of them. The usual approach loops over cells in Python, pulling out each cell's points and fitting them one at a time. That's simple, but the loop overhead dominates.</p>
+    <p>The key observation is that an ordinary least-squares fit doesn't need the points themselves, only each cell's <strong>means and covariances</strong>. DuckDB can compute those for every cell in a single <code>GROUP BY</code>, streaming through the data in parallel. The tiny per-cell systems of equations are then solved all at once in NumPy.</p>
+
+    <div class="dq dq-fig" role="figure" aria-label="Per-cell fitting, loop versus SQL">
+      <h4>Fitting every cell, two ways</h4>
+      <p class="dq-sub">The same model, fitted in every A5 cell across Greenland.</p>
+      <div class="dq-arch">
+        <div class="dq-col dq-old">
+          <h5>Loop over cells</h5>
+          <div class="dq-step"><b>Load points into memory</b><span>All ~94 million rows as a DataFrame</span></div>
+          <div class="dq-arrow">↓</div>
+          <div class="dq-step"><b>For each cell…</b><span>Select its points, fit, store the result</span></div>
+          <div class="dq-arrow">↓</div>
+          <div class="dq-step"><b>Repeat for outlier rejection</b><span>Refit every cell after dropping outliers</span></div>
+          <div class="dq-out dq-tbd">≈ TBC</div>
+        </div>
+        <div class="dq-col dq-new">
+          <h5>Summary statistics in SQL</h5>
+          <div class="dq-step"><b>One GROUP BY per fit</b><span>Means and covariances for every cell, straight from the database</span></div>
+          <div class="dq-arrow">↓</div>
+          <div class="dq-step"><b>Batched solve</b><span>All the small k×k systems at once in NumPy</span></div>
+          <div class="dq-arrow">↓</div>
+          <div class="dq-step"><b>One pass to reject outliers</b><span>Residuals and keep-flags for every point, then refit</span></div>
+          <div class="dq-out dq-tbd">≈ TBC</div>
+        </div>
+      </div>
+      <p class="dq-cap">The loop costs grow with the number of cells; the SQL approach costs a few scans of the data however many cells there are. <!-- TODO: fill in benchmark times --></p>
+    </div>
+
+    <pre class="dq-code"><code>-- one fit for every cell: means + covariances, nothing else
+SELECT cell, count(*) AS n, avg(h) AS m_h, avg(t) AS m_t,
+       covar_pop(dx, dx) AS c_xx, covar_pop(dx, t) AS c_xt, covar_pop(t, t) AS c_tt,
+       covar_pop(h, dx)  AS c_hx, covar_pop(h, t)  AS c_ht   -- ...one per pair of terms
+FROM points WHERE keep
+GROUP BY cell
+HAVING count(*) &gt;= 40 AND max(t) - min(t) &gt;= 2;</code></pre>
+
+    <h3>4. The model</h3>
+    <p>In each cell I fit the model-fit approach used for CryoSat-2 elevation change at the Centre for Polar Observation and Modelling (McMillan et al., 2016; Slater et al., 2021). A quadratic surface absorbs the topography within the cell, a heading term absorbs differences between ascending and descending passes, and the time term gives the rate of change:</p>
+    <div class="dq-eq">h = h<sub>0</sub> + a<sub>1</sub>x + a<sub>2</sub>y + a<sub>3</sub>x<sup>2</sup> + a<sub>4</sub>y<sup>2</sup> + a<sub>5</sub>xy + a<sub>6</sub>·heading + <strong>(dh/dt)</strong>·t</div>
+    <p>For CryoSat-2, changes in radar backscatter can masquerade as elevation change, so the fitted rate is corrected afterwards using the relationship between elevation and backscatter power in each cell. Outliers are handled by iterative 3σ rejection: fit, drop points far from the fit, refit. Cells are kept only if they pass the published quality checks (at least 40 points over at least 2 years, residual RMS ≤ 12 m, |dh/dt| ≤ 10 m/yr, surface slope ≤ 5°). A simpler plane-only model is kept alongside for comparison.</p>
+    <p>Some details aren't fully specified in the papers, so they are my interpretation: the backscatter correction uses time-detrended residuals over the whole record rather than a moving window, and "heading" is the ascending/descending flag.</p>
+
+    <h3>5. Testing against a known answer</h3>
+    <p>Before trusting it on real data, I built a synthetic ice sheet where the true dh/dt is known: a sloping, undulating surface, measurement noise, 3% gross outliers, a 0.4 m offset between ascending and descending passes, and a backscatter signal that leaks into elevation. Then I checked whether each model recovers the truth.</p>
+
+    <div class="dq dq-fig" role="figure" aria-label="Validation against synthetic truth">
+      <h4>Recovering a known dh/dt</h4>
+      <p class="dq-sub">Synthetic data, 8 million points. Bias is the median error against the true rate.</p>
+      <div class="dq-hero">
+        <div class="dq-stat"><b>+0.135 m/yr</b><span>Plane fit bias (backscatter leaks into the trend)</span></div>
+        <div class="dq-stat"><b>+0.007 m/yr</b><span>Full model, after backscatter correction</span></div>
+        <div class="dq-stat"><b>99%</b><span>Cells whose true rate lies within 2 standard errors</span></div>
+      </div>
+      <p class="dq-cap">The correction also recovered the planted physics: an elevation–backscatter gradient of 0.47 (true 0.5) and a backscatter trend of 0.27 per year (true 0.3).</p>
+    </div>
+
+    <!-- ===================================================================== -->
+    <h2>Interactive map</h2>
+    <p>Explore dh/dt across Greenland. The grid adapts as you zoom: zoomed out, you see large cells summarising whole regions; zoom in and they split into finer cells, down to the individual fits.</p>
+
+    <div class="dq dq-fig">
+      <div id="dhdt-map" class="dq-map" aria-label="Interactive map of Greenland surface elevation change on A5 cells">
+        Interactive dh/dt map: coming soon
+      </div>
+      <div class="dq-zoom" aria-label="Map zoom to A5 resolution">
+        <div>zoom ≤ 4<b>res 7</b>2,075 km²</div>
+        <div>zoom 5<b>res 8</b>519 km²</div>
+        <div>zoom 6<b>res 9</b>130 km²</div>
+        <div>zoom 7<b>res 10</b>32 km²</div>
+        <div>zoom 8<b>res 11</b>8.1 km²</div>
+        <div>zoom ≥ 9<b>res 12</b>2.0 km²</div>
+      </div>
+      <p class="dq-cap">Each zoom level shows the A5 resolution whose cells are a sensible size on screen. Coarser cells show the median dh/dt of the fits they contain, computed by rolling up the fine results.</p>
+    </div>
+    <!--
+      PLAN FOR THE LIVE MAP (practical part, to do later)
+      - Data: from dhdt_cells_<method>.parquet, pre-compute one small table per resolution
+        (res 7–12): cell id (hex string), median dh/dt, n fits, median SE. Roll up with
+        a5_cell_to_parent in DuckDB. Coarse levels are tiny; fine levels are only needed
+        for the area in view.
+      - Hosting options on GitHub Pages:
+          a) per-resolution files (JSON/Parquet), split into chunks by a coarse parent cell
+             so only cells in view are fetched; or
+          b) one Parquet file sorted by cell, queried in the browser with DuckDB-WASM using
+             HTTP range requests (nice continuity with the DuckDB story).
+      - Drawing: on each map 'moveend', pick the resolution from the zoom (table above),
+        fetch the cells in view, build pentagon polygons in the browser with the A5
+        JavaScript library (check its cell-to-boundary function), and update a MapLibre
+        GeoJSON source styled with a diverging colour ramp (red = lowering, blue = rising).
+      - Popup on click: dh/dt ± SE, number of points, time span.
+      - Basemap: same imagery/style as the static figures.
+    -->
+
+    <!-- ===================================================================== -->
+    <h2>Results</h2>
+    <!-- TODO: fill with numbers from the real runs (CryoSat-2 and ICESat-2) -->
+    <div class="dq dq-fig" role="figure" aria-label="Headline results">
+      <div class="dq-hero">
+        <div class="dq-stat"><b class="dq-tbd">TBC</b><span>Points per km² per year, NEGIS vs Helheim</span></div>
+        <div class="dq-stat"><b class="dq-tbd">TBC</b><span>Cells fitted across Greenland</span></div>
+        <div class="dq-stat"><b class="dq-tbd">TBC</b><span>Time per fitting pass, ~94 million points</span></div>
+      </div>
+    </div>
+    <!-- TODO: add the dh/dt figure (greenland_dhdt_a5_slater2021.png → .webp)
+    <figure style="margin:1.25rem 0">
+      <img src="a5_content/dhdt.webp" alt="Greenland surface elevation change on A5 cells, with insets for the four study sites" style="display:block;width:100%;height:auto;border-radius:8px" loading="lazy">
+      <figcaption style="font-size:.9em;opacity:.8;margin-top:.4rem">CryoSat-2 dh/dt fitted in every A5 cell.</figcaption>
+    </figure>
+    -->
+
+    <h3>Benchmarks</h3>
+    <!-- TODO: run the benchmark script and fill in -->
+    <div class="dq dq-tw">
+      <table class="dq-t">
+        <thead><tr><th>Approach</th><th>What it does</th><th>Time</th><th>Peak memory</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Python loop</strong></td><td>NumPy least squares, one cell at a time</td><td class="num dq-tbd">TBC</td><td class="num dq-tbd">TBC</td></tr>
+          <tr><td><strong>pandas groupby-apply</strong></td><td>The same fit applied per group</td><td class="num dq-tbd">TBC</td><td class="num dq-tbd">TBC</td></tr>
+          <tr class="hl"><td><strong>DuckDB summary statistics</strong></td><td>One GROUP BY, batched solve</td><td class="num dq-tbd">TBC</td><td class="num dq-tbd">TBC</td></tr>
+          <tr><td><strong>Roll-up to a coarser grid</strong></td><td>Parent cells from cached counts vs rescanning</td><td class="num dq-tbd">TBC</td><td class="num dq-tbd">TBC</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===================================================================== -->
+    <h2>What I learned</h2>
+    <ul>
+      <li><strong>Reframe the computation, not just the code.</strong> Recognising that a regression only needs summary statistics turned hundreds of thousands of small fits into a few database scans.</li>
+      <li><strong>The grid is part of the method.</strong> Choosing a grid looks like a plotting decision, but it decides whether a comparison between regions is fair. Equal-area cells remove a bias I would otherwise have had to correct for.</li>
+      <li><strong>Hierarchies pay off twice.</strong> Nested cells made coarse summaries free in the analysis, and they are exactly what an interactive map needs to switch detail as you zoom.</li>
+      <li><strong>Validate on a known answer.</strong> A synthetic test with planted biases showed which model terms actually matter, before any real data was involved.</li>
+      <li><strong>New tools come with rough edges.</strong> A5 is young: its DuckDB extension needs installing per machine, and its cell IDs have changed between versions. Pinning versions and checking a known point at start-up kept the pipeline honest.</li>
+    </ul>
+    <p>Next steps: run both missions across the full record, publish the interactive map, and compare against independent airborne laser altimetry.</p>
+
+    <h2>References</h2>
+    <ul>
+      <li>McMillan, M., et al. (2016). A high-resolution record of Greenland mass balance. <em>Geophysical Research Letters</em>, 43. <a href="https://doi.org/10.1002/2016GL069666" target="_blank" rel="noopener">doi:10.1002/2016GL069666</a></li>
+      <li>Slater, T., et al. (2021). Increased variability in Greenland Ice Sheet runoff from satellite observations. <em>Nature Communications</em>, 12, 6069. <a href="https://doi.org/10.1038/s41467-021-26229-4" target="_blank" rel="noopener">doi:10.1038/s41467-021-26229-4</a></li>
+      <li>A5: a global, equal-area, pentagonal discrete global grid. <a href="https://a5geo.org" target="_blank" rel="noopener">a5geo.org</a></li>
+      <li>DuckDB <code>a5</code> community extension. <a href="https://duckdb.org/community_extensions/extensions/a5.html" target="_blank" rel="noopener">duckdb.org</a></li>
+    </ul>
+
+    <div class="links">
+      <!-- <a class="button" href="https://github.com/H4rdy12" target="_blank" rel="noopener">View code</a> -->
+      <a class="button secondary" href="../index.html">All projects</a>
+    </div>
+
+<!-- Logos come from "logo" and "partner_logos" in data/projects.geojson -->
+<footer id="logo-strip" class="logo-strip" aria-label="Logos" hidden></footer>
+</article>
+
+  <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+  <script src="../js/project-page.js"></script>
+</body>
+</html>
