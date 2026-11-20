@@ -16,7 +16,7 @@
     <div class="tags">
       <span class="tag">DuckDB</span><span class="tag">A5</span><span class="tag">DGGS</span>
       <span class="tag">SQL</span><span class="tag">Python</span><span class="tag">NumPy</span>
-      <span class="tag">CryoSat-2</span><span class="tag">ICESat-2</span><span class="tag">MapLibre</span>
+      <span class="tag">CryoSat-2</span><span class="tag">ICESat-2</span><span class="tag">MapLibre</span><span class="tag">PMTiles</span>
     </div>
 
     <style>
@@ -65,6 +65,14 @@
       @media (max-width:560px){.dq-zoom{grid-template-columns:repeat(3,1fr)}}
       .dq-zoom div{border:1px solid var(--line);border-radius:6px;padding:.35rem .2rem}
       .dq-zoom b{display:block;font-variant-numeric:tabular-nums}
+      .dq-map.is-live{display:block;padding:0;border-style:solid;overflow:hidden}
+      .dq-legend{position:absolute;left:10px;bottom:10px;z-index:2;background:rgba(255,255,255,.92);color:#1d1d1f;
+                 border-radius:8px;padding:.45rem .6rem;font-size:.78rem;line-height:1.3;min-width:190px;
+                 box-shadow:0 1px 4px rgba(0,0,0,.25)}
+      .dq-legend-t{font-weight:600;margin-bottom:.25rem}
+      .dq-legend-bar{height:10px;border-radius:3px}
+      .dq-legend-l{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums;margin-top:.15rem}
+      .dq-legend-res{margin-top:.35rem;padding-top:.3rem;border-top:1px solid rgba(0,0,0,.12);color:#444}
     </style>
 
     <!-- ===================================================================== -->
@@ -186,8 +194,11 @@ HAVING count(*) &gt;= 40 AND max(t) - min(t) &gt;= 2;</code></pre>
     <p>Explore dh/dt across Greenland. The grid adapts as you zoom: zoomed out, you see large cells summarising whole regions; zoom in and they split into finer cells, down to the individual fits.</p>
 
     <div class="dq dq-fig">
-      <div id="dhdt-map" class="dq-map" aria-label="Interactive map of Greenland surface elevation change on A5 cells">
-        Interactive dh/dt map: coming soon
+      <!-- data-base: folder holding the exporter output (dhdt_meta.json + dhdt_a5.pmtiles).
+           data-mode: "pmtiles" for the real site, "geojson" for quick local tests. -->
+      <div id="dhdt-map" class="dq-map" data-base="../data/a5_content/" data-mode="pmtiles"
+           aria-label="Interactive map of Greenland surface elevation change on A5 cells">
+        Loading the interactive dh/dt map…
       </div>
       <div class="dq-zoom" aria-label="Map zoom to A5 resolution">
         <div>zoom ≤ 4<b>res 7</b>2,075 km²</div>
@@ -197,26 +208,11 @@ HAVING count(*) &gt;= 40 AND max(t) - min(t) &gt;= 2;</code></pre>
         <div>zoom 8<b>res 11</b>8.1 km²</div>
         <div>zoom ≥ 9<b>res 12</b>2.0 km²</div>
       </div>
-      <p class="dq-cap">Each zoom level shows the A5 resolution whose cells are a sensible size on screen. Coarser cells show the median dh/dt of the fits they contain, computed by rolling up the fine results.</p>
+      <p class="dq-cap">Click a cell for its rate, uncertainty and number of points. Each zoom level shows the A5 resolution whose cells are a sensible size on screen. Coarser cells show the median dh/dt of the fits they contain, computed by rolling up the fine results.</p>
     </div>
-    <!--
-      PLAN FOR THE LIVE MAP (practical part, to do later)
-      - Data: from dhdt_cells_<method>.parquet, pre-compute one small table per resolution
-        (res 7–12): cell id (hex string), median dh/dt, n fits, median SE. Roll up with
-        a5_cell_to_parent in DuckDB. Coarse levels are tiny; fine levels are only needed
-        for the area in view.
-      - Hosting options on GitHub Pages:
-          a) per-resolution files (JSON/Parquet), split into chunks by a coarse parent cell
-             so only cells in view are fetched; or
-          b) one Parquet file sorted by cell, queried in the browser with DuckDB-WASM using
-             HTTP range requests (nice continuity with the DuckDB story).
-      - Drawing: on each map 'moveend', pick the resolution from the zoom (table above),
-        fetch the cells in view, build pentagon polygons in the browser with the A5
-        JavaScript library (check its cell-to-boundary function), and update a MapLibre
-        GeoJSON source styled with a diverging colour ramp (red = lowering, blue = rising).
-      - Popup on click: dh/dt ± SE, number of points, time span.
-      - Basemap: same imagery/style as the static figures.
-    -->
+    <!-- Map data: run export_dhdt_tiles.py on dhdt_cells_<method>.parquet, then tippecanoe
+         (command printed by the exporter). Copy dhdt_meta.json + dhdt_a5.pmtiles into
+         projects/a5_content/. The map code lives in js/a5-dhdt-map.js. -->
 
     <!-- ===================================================================== -->
     <h2>Results</h2>
@@ -278,6 +274,8 @@ HAVING count(*) &gt;= 40 AND max(t) - min(t) &gt;= 2;</code></pre>
 </article>
 
   <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/pmtiles@3.2.0/dist/pmtiles.js"></script>
   <script src="../js/project-page.js"></script>
+  <script src="../js/a5-dhdt-map.js"></script>
 </body>
 </html>

@@ -91,6 +91,29 @@
           { "src": "images/logos/NERC_logo.svg", "alt": "NERC", "url": "https://www.ukri.org/councils/nerc/" }
         ]
       }
-    }
+    },
+    {
+  "type": "Feature",
+  "geometry": { "type": "Point", "coordinates": [-2.7745, 54.0085] },
+  "properties": {
+    "id": "a5-dhdt",
+    "title": "Ice-sheet change on an equal-area grid",
+    "role": "PhD researcher",
+    "place": "Lancaster University",
+    "category": "Research",
+    "dates": "2026",
+    "sort_year": 2026,
+    "coverage": "Greenland",
+    "summary": "Fitted surface elevation change in every cell of the equal-area A5 grid across Greenland, as a few DuckDB passes over ~94 million altimetry points per mission.",
+    "tools": ["DuckDB", "A5", "DGGS", "SQL", "Python", "NumPy", "CryoSat-2", "ICESat-2", "MapLibre", "PMTiles"],
+    "url": "projects/a5_dhdt.html",
+    "logo": "images/logos/DEMSquad_Logo_Team (2).svg",
+    "partner_logos": [
+      { "src": "images/logos/lu-logo.svg", "alt": "Lancaster University", "url": "https://www.lancaster.ac.uk" },
+      { "src": "images/logos/NERC_logo.svg", "alt": "NERC", "url": "https://www.ukri.org/councils/nerc/" },
+      { "src": "images/logos/DuckDB_stack-lightmode.svg", "alt": "DuckDB", "url": "https://duckdb.org/" }
+    ]
+  }
+}
   ]
 }
