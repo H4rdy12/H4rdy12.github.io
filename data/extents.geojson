@@ -11,11 +11,26 @@
         "type": "Polygon",
         "coordinates": [
           [
-            [-74, 59.5],
-            [-11, 59.5],
-            [-11, 83.7],
-            [-74, 83.7],
-            [-74, 59.5]
+            [
+              -74,
+              59.5
+            ],
+            [
+              -11,
+              59.5
+            ],
+            [
+              -11,
+              83.7
+            ],
+            [
+              -74,
+              83.7
+            ],
+            [
+              -74,
+              59.5
+            ]
           ]
         ]
       }
@@ -31,27 +46,90 @@
         "type": "Polygon",
         "coordinates": [
           [
-            [-180, -60],
-            [-170, -60],
-            [-160, -60],
-            [-150, -60],
-            [-140, -60],
-            [-130, -60],
-            [-120, -60],
-            [-110, -60],
-            [-100, -60],
-            [-90, -60],
-            [-90, -85],
-            [-100, -85],
-            [-110, -85],
-            [-120, -85],
-            [-130, -85],
-            [-140, -85],
-            [-150, -85],
-            [-160, -85],
-            [-170, -85],
-            [-180, -85],
-            [-180, -60]
+            [
+              -180,
+              -60
+            ],
+            [
+              -170,
+              -60
+            ],
+            [
+              -160,
+              -60
+            ],
+            [
+              -150,
+              -60
+            ],
+            [
+              -140,
+              -60
+            ],
+            [
+              -130,
+              -60
+            ],
+            [
+              -120,
+              -60
+            ],
+            [
+              -110,
+              -60
+            ],
+            [
+              -100,
+              -60
+            ],
+            [
+              -90,
+              -60
+            ],
+            [
+              -90,
+              -85
+            ],
+            [
+              -100,
+              -85
+            ],
+            [
+              -110,
+              -85
+            ],
+            [
+              -120,
+              -85
+            ],
+            [
+              -130,
+              -85
+            ],
+            [
+              -140,
+              -85
+            ],
+            [
+              -150,
+              -85
+            ],
+            [
+              -160,
+              -85
+            ],
+            [
+              -170,
+              -85
+            ],
+            [
+              -180,
+              -85
+            ],
+            [
+              -180,
+              -60
+            ]
           ]
         ]
       }
@@ -67,27 +145,90 @@
         "type": "Polygon",
         "coordinates": [
           [
-            [-90, -60],
-            [-80, -60],
-            [-70, -60],
-            [-60, -60],
-            [-50, -60],
-            [-40, -60],
-            [-30, -60],
-            [-20, -60],
-            [-10, -60],
-            [0, -60],
-            [0, -85],
-            [-10, -85],
-            [-20, -85],
-            [-30, -85],
-            [-40, -85],
-            [-50, -85],
-            [-60, -85],
-            [-70, -85],
-            [-80, -85],
-            [-90, -85],
-            [-90, -60]
+            [
+              -90,
+              -60
+            ],
+            [
+              -80,
+              -60
+            ],
+            [
+              -70,
+              -60
+            ],
+            [
+              -60,
+              -60
+            ],
+            [
+              -50,
+              -60
+            ],
+            [
+              -40,
+              -60
+            ],
+            [
+              -30,
+              -60
+            ],
+            [
+              -20,
+              -60
+            ],
+            [
+              -10,
+              -60
+            ],
+            [
+              0,
+              -60
+            ],
+            [
+              0,
+              -85
+            ],
+            [
+              -10,
+              -85
+            ],
+            [
+              -20,
+              -85
+            ],
+            [
+              -30,
+              -85
+            ],
+            [
+              -40,
+              -85
+            ],
+            [
+              -50,
+              -85
+            ],
+            [
+              -60,
+              -85
+            ],
+            [
+              -70,
+              -85
+            ],
+            [
+              -80,
+              -85
+            ],
+            [
+              -90,
+              -85
+            ],
+            [
+              -90,
+              -60
+            ]
           ]
         ]
       }
@@ -103,27 +244,90 @@
         "type": "Polygon",
         "coordinates": [
           [
-            [0, -60],
-            [10, -60],
-            [20, -60],
-            [30, -60],
-            [40, -60],
-            [50, -60],
-            [60, -60],
-            [70, -60],
-            [80, -60],
-            [90, -60],
-            [90, -85],
-            [80, -85],
-            [70, -85],
-            [60, -85],
-            [50, -85],
-            [40, -85],
-            [30, -85],
-            [20, -85],
-            [10, -85],
-            [0, -85],
-            [0, -60]
+            [
+              0,
+              -60
+            ],
+            [
+              10,
+              -60
+            ],
+            [
+              20,
+              -60
+            ],
+            [
+              30,
+              -60
+            ],
+            [
+              40,
+              -60
+            ],
+            [
+              50,
+              -60
+            ],
+            [
+              60,
+              -60
+            ],
+            [
+              70,
+              -60
+            ],
+            [
+              80,
+              -60
+            ],
+            [
+              90,
+              -60
+            ],
+            [
+              90,
+              -85
+            ],
+            [
+              80,
+              -85
+            ],
+            [
+              70,
+              -85
+            ],
+            [
+              60,
+              -85
+            ],
+            [
+              50,
+              -85
+            ],
+            [
+              40,
+              -85
+            ],
+            [
+              30,
+              -85
+            ],
+            [
+              20,
+              -85
+            ],
+            [
+              10,
+              -85
+            ],
+            [
+              0,
+              -85
+            ],
+            [
+              0,
+              -60
+            ]
           ]
         ]
       }
@@ -139,27 +343,90 @@
         "type": "Polygon",
         "coordinates": [
           [
-            [90, -60],
-            [100, -60],
-            [110, -60],
-            [120, -60],
-            [130, -60],
-            [140, -60],
-            [150, -60],
-            [160, -60],
-            [170, -60],
-            [180, -60],
-            [180, -85],
-            [170, -85],
-            [160, -85],
-            [150, -85],
-            [140, -85],
-            [130, -85],
-            [120, -85],
-            [110, -85],
-            [100, -85],
-            [90, -85],
-            [90, -60]
+            [
+              90,
+              -60
+            ],
+            [
+              100,
+              -60
+            ],
+            [
+              110,
+              -60
+            ],
+            [
+              120,
+              -60
+            ],
+            [
+              130,
+              -60
+            ],
+            [
+              140,
+              -60
+            ],
+            [
+              150,
+              -60
+            ],
+            [
+              160,
+              -60
+            ],
+            [
+              170,
+              -60
+            ],
+            [
+              180,
+              -60
+            ],
+            [
+              180,
+              -85
+            ],
+            [
+              170,
+              -85
+            ],
+            [
+              160,
+              -85
+            ],
+            [
+              150,
+              -85
+            ],
+            [
+              140,
+              -85
+            ],
+            [
+              130,
+              -85
+            ],
+            [
+              120,
+              -85
+            ],
+            [
+              110,
+              -85
+            ],
+            [
+              100,
+              -85
+            ],
+            [
+              90,
+              -85
+            ],
+            [
+              90,
+              -60
+            ]
           ]
         ]
       }
@@ -173,43 +440,154 @@
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [-180, -60],
-          [-170, -60],
-          [-160, -60],
-          [-150, -60],
-          [-140, -60],
-          [-130, -60],
-          [-120, -60],
-          [-110, -60],
-          [-100, -60],
-          [-90, -60],
-          [-80, -60],
-          [-70, -60],
-          [-60, -60],
-          [-50, -60],
-          [-40, -60],
-          [-30, -60],
-          [-20, -60],
-          [-10, -60],
-          [0, -60],
-          [10, -60],
-          [20, -60],
-          [30, -60],
-          [40, -60],
-          [50, -60],
-          [60, -60],
-          [70, -60],
-          [80, -60],
-          [90, -60],
-          [100, -60],
-          [110, -60],
-          [120, -60],
-          [130, -60],
-          [140, -60],
-          [150, -60],
-          [160, -60],
-          [170, -60],
-          [180, -60]
+          [
+            -180,
+            -60
+          ],
+          [
+            -170,
+            -60
+          ],
+          [
+            -160,
+            -60
+          ],
+          [
+            -150,
+            -60
+          ],
+          [
+            -140,
+            -60
+          ],
+          [
+            -130,
+            -60
+          ],
+          [
+            -120,
+            -60
+          ],
+          [
+            -110,
+            -60
+          ],
+          [
+            -100,
+            -60
+          ],
+          [
+            -90,
+            -60
+          ],
+          [
+            -80,
+            -60
+          ],
+          [
+            -70,
+            -60
+          ],
+          [
+            -60,
+            -60
+          ],
+          [
+            -50,
+            -60
+          ],
+          [
+            -40,
+            -60
+          ],
+          [
+            -30,
+            -60
+          ],
+          [
+            -20,
+            -60
+          ],
+          [
+            -10,
+            -60
+          ],
+          [
+            0,
+            -60
+          ],
+          [
+            10,
+            -60
+          ],
+          [
+            20,
+            -60
+          ],
+          [
+            30,
+            -60
+          ],
+          [
+            40,
+            -60
+          ],
+          [
+            50,
+            -60
+          ],
+          [
+            60,
+            -60
+          ],
+          [
+            70,
+            -60
+          ],
+          [
+            80,
+            -60
+          ],
+          [
+            90,
+            -60
+          ],
+          [
+            100,
+            -60
+          ],
+          [
+            110,
+            -60
+          ],
+          [
+            120,
+            -60
+          ],
+          [
+            130,
+            -60
+          ],
+          [
+            140,
+            -60
+          ],
+          [
+            150,
+            -60
+          ],
+          [
+            160,
+            -60
+          ],
+          [
+            170,
+            -60
+          ],
+          [
+            180,
+            -60
+          ]
         ]
       }
     },
@@ -223,35 +601,663 @@
         "type": "Polygon",
         "coordinates": [
           [
-            [-74, 59.5],
-            [-11, 59.5],
-            [-11, 83.7],
-            [-74, 83.7],
-            [-74, 59.5]
+            [
+              -74,
+              59.5
+            ],
+            [
+              -11,
+              59.5
+            ],
+            [
+              -11,
+              83.7
+            ],
+            [
+              -74,
+              83.7
+            ],
+            [
+              -74,
+              59.5
+            ]
           ]
         ]
       }
     },
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "SRTM (56°S – 60°N)", "color": "#d97706", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[-179.99, -56], [-90, -56], [-90, 60], [-179.99, 60], [-179.99, -56]]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "SRTM (56°S – 60°N)", "color": "#d97706", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[-90, -56], [0, -56], [0, 60], [-90, 60], [-90, -56]]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "SRTM (56°S – 60°N)", "color": "#d97706", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[0, -56], [90, -56], [90, 60], [0, 60], [0, -56]]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "SRTM (56°S – 60°N)", "color": "#d97706", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[90, -56], [179.99, -56], [179.99, 60], [90, 60], [90, -56]]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "SRTM (56°S – 60°N)", "color": "#d97706"}, "geometry": {"type": "LineString", "coordinates": [[-180, 60], [-90, 60], [0, 60], [90, 60], [180, 60]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "SRTM (56°S – 60°N)", "color": "#d97706"}, "geometry": {"type": "LineString", "coordinates": [[-180, -56], [-90, -56], [0, -56], [90, -56], [180, -56]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "ArcticDEM (north of 60°N)", "color": "#2563eb", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[-179.99, 60], [-90, 60], [-90, 85], [-179.99, 85], [-179.99, 60]]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "ArcticDEM (north of 60°N)", "color": "#2563eb", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[-90, 60], [0, 60], [0, 85], [-90, 85], [-90, 60]]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "ArcticDEM (north of 60°N)", "color": "#2563eb", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[0, 60], [90, 60], [90, 85], [0, 85], [0, 60]]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "ArcticDEM (north of 60°N)", "color": "#2563eb", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[90, 60], [179.99, 60], [179.99, 85], [90, 85], [90, 60]]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "ArcticDEM (north of 60°N)", "color": "#2563eb"}, "geometry": {"type": "LineString", "coordinates": [[-180, 60], [-90, 60], [0, 60], [90, 60], [180, 60]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "REMA (Antarctica)", "color": "#228B22", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[-179.99, -85], [-90, -85], [-90, -60], [-179.99, -60], [-179.99, -85]]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "REMA (Antarctica)", "color": "#228B22", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[-90, -85], [0, -85], [0, -60], [-90, -60], [-90, -85]]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "REMA (Antarctica)", "color": "#228B22", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[0, -85], [90, -85], [90, -60], [0, -60], [0, -85]]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "REMA (Antarctica)", "color": "#228B22", "outline": false}, "geometry": {"type": "Polygon", "coordinates": [[[90, -85], [179.99, -85], [179.99, -60], [90, -60], [90, -85]]]}},
-    {"type": "Feature", "properties": {"project": "terratexture", "label": "REMA (Antarctica)", "color": "#228B22"}, "geometry": {"type": "LineString", "coordinates": [[-180, -60], [-90, -60], [0, -60], [90, -60], [180, -60]]}},
     {
       "type": "Feature",
-      "properties": { "project": "duckdb-altimetry", "name": "Greenland Ice Sheet", "description": "22.5 billion altimetry points" },
-      "geometry": { "type": "Polygon", "coordinates": [[[-74,59],[-10,59],[-10,84],[-74,84],[-74,59]]] }
+      "properties": {
+        "project": "terratexture",
+        "label": "SRTM (56°S – 60°N)",
+        "color": "#d97706",
+        "outline": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -179.99,
+              -56
+            ],
+            [
+              -90,
+              -56
+            ],
+            [
+              -90,
+              60
+            ],
+            [
+              -179.99,
+              60
+            ],
+            [
+              -179.99,
+              -56
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "SRTM (56°S – 60°N)",
+        "color": "#d97706",
+        "outline": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -90,
+              -56
+            ],
+            [
+              0,
+              -56
+            ],
+            [
+              0,
+              60
+            ],
+            [
+              -90,
+              60
+            ],
+            [
+              -90,
+              -56
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "SRTM (56°S – 60°N)",
+        "color": "#d97706",
+        "outline": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0,
+              -56
+            ],
+            [
+              90,
+              -56
+            ],
+            [
+              90,
+              60
+            ],
+            [
+              0,
+              60
+            ],
+            [
+              0,
+              -56
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "SRTM (56°S – 60°N)",
+        "color": "#d97706",
+        "outline": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              90,
+              -56
+            ],
+            [
+              179.99,
+              -56
+            ],
+            [
+              179.99,
+              60
+            ],
+            [
+              90,
+              60
+            ],
+            [
+              90,
+              -56
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "SRTM (56°S – 60°N)",
+        "color": "#d97706"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -180,
+            60
+          ],
+          [
+            -90,
+            60
+          ],
+          [
+            0,
+            60
+          ],
+          [
+            90,
+            60
+          ],
+          [
+            180,
+            60
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "SRTM (56°S – 60°N)",
+        "color": "#d97706"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -180,
+            -56
+          ],
+          [
+            -90,
+            -56
+          ],
+          [
+            0,
+            -56
+          ],
+          [
+            90,
+            -56
+          ],
+          [
+            180,
+            -56
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "ArcticDEM (north of 60°N)",
+        "color": "#2563eb",
+        "outline": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -179.99,
+              60
+            ],
+            [
+              -90,
+              60
+            ],
+            [
+              -90,
+              85
+            ],
+            [
+              -179.99,
+              85
+            ],
+            [
+              -179.99,
+              60
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "ArcticDEM (north of 60°N)",
+        "color": "#2563eb",
+        "outline": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -90,
+              60
+            ],
+            [
+              0,
+              60
+            ],
+            [
+              0,
+              85
+            ],
+            [
+              -90,
+              85
+            ],
+            [
+              -90,
+              60
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "ArcticDEM (north of 60°N)",
+        "color": "#2563eb",
+        "outline": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0,
+              60
+            ],
+            [
+              90,
+              60
+            ],
+            [
+              90,
+              85
+            ],
+            [
+              0,
+              85
+            ],
+            [
+              0,
+              60
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "ArcticDEM (north of 60°N)",
+        "color": "#2563eb",
+        "outline": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              90,
+              60
+            ],
+            [
+              179.99,
+              60
+            ],
+            [
+              179.99,
+              85
+            ],
+            [
+              90,
+              85
+            ],
+            [
+              90,
+              60
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "ArcticDEM (north of 60°N)",
+        "color": "#2563eb"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -180,
+            60
+          ],
+          [
+            -90,
+            60
+          ],
+          [
+            0,
+            60
+          ],
+          [
+            90,
+            60
+          ],
+          [
+            180,
+            60
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "REMA (Antarctica)",
+        "color": "#228B22",
+        "outline": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -179.99,
+              -85
+            ],
+            [
+              -90,
+              -85
+            ],
+            [
+              -90,
+              -60
+            ],
+            [
+              -179.99,
+              -60
+            ],
+            [
+              -179.99,
+              -85
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "REMA (Antarctica)",
+        "color": "#228B22",
+        "outline": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -90,
+              -85
+            ],
+            [
+              0,
+              -85
+            ],
+            [
+              0,
+              -60
+            ],
+            [
+              -90,
+              -60
+            ],
+            [
+              -90,
+              -85
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "REMA (Antarctica)",
+        "color": "#228B22",
+        "outline": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0,
+              -85
+            ],
+            [
+              90,
+              -85
+            ],
+            [
+              90,
+              -60
+            ],
+            [
+              0,
+              -60
+            ],
+            [
+              0,
+              -85
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "REMA (Antarctica)",
+        "color": "#228B22",
+        "outline": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              90,
+              -85
+            ],
+            [
+              179.99,
+              -85
+            ],
+            [
+              179.99,
+              -60
+            ],
+            [
+              90,
+              -60
+            ],
+            [
+              90,
+              -85
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "terratexture",
+        "label": "REMA (Antarctica)",
+        "color": "#228B22"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -180,
+            -60
+          ],
+          [
+            -90,
+            -60
+          ],
+          [
+            0,
+            -60
+          ],
+          [
+            90,
+            -60
+          ],
+          [
+            180,
+            -60
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "duckdb-altimetry",
+        "name": "Greenland Ice Sheet",
+        "description": "22.5 billion altimetry points"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -74,
+              59
+            ],
+            [
+              -10,
+              59
+            ],
+            [
+              -10,
+              84
+            ],
+            [
+              -74,
+              84
+            ],
+            [
+              -74,
+              59
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "project": "a5-dhdt",
+        "label": "Greenland Ice Sheet",
+        "description": "~94 million altimetry points per mission"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -74,
+              59
+            ],
+            [
+              -10,
+              59
+            ],
+            [
+              -10,
+              84
+            ],
+            [
+              -74,
+              84
+            ],
+            [
+              -74,
+              59
+            ]
+          ]
+        ]
+      }
     }
   ]
 }
